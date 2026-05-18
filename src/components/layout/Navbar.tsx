@@ -1,13 +1,12 @@
 import { Link, NavLink, useNavigate } from "react-router";
-import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [token] = useState(localStorage.getItem("token"));
+  const { isAuthenticated, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    logout();
     navigate("/login");
   };
 
@@ -42,7 +41,7 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          {token ? (
+          {isAuthenticated ? (
             <button
               onClick={handleLogout}
               className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
