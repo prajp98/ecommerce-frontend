@@ -210,10 +210,10 @@ export default function CartPage() {
             </div>
 
             <Link
-              to="/addresses"
-              className="mt-6 inline-flex w-full justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-            >
-              Proceed to addresses
+                to="/checkout"
+                className="mt-6 inline-flex w-full justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+                >
+                Proceed to checkout
             </Link>
 
             <Link
