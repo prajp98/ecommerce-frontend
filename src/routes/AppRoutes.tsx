@@ -7,6 +7,7 @@ import ProductsPage from "../pages/products/ProductsPage";
 import ProductDetailPage from "../pages/products/ProductDetailPage";
 import CartPage from "../pages/cart/CartPage";
 import AddressesPage from "../pages/addresses/AddressesPage";
+import CheckoutPage from "../pages/orders/CheckoutPage";
 
 function OrdersPage() {
   return <div className="mx-auto max-w-7xl px-4 py-10">Orders page</div>;
@@ -29,6 +30,7 @@ export default function AppRoutes() {
         <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/addresses" element={<AddressesPage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Route>
