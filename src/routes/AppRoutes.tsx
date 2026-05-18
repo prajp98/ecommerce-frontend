@@ -3,10 +3,8 @@ import AppLayout from "../components/layout/AppLayout";
 import HomePage from "../pages/home/HomePage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
-
-function ProductsPage() {
-  return <div className="mx-auto max-w-7xl px-4 py-10">Products page</div>;
-}
+import ProductsPage from "../pages/products/ProductsPage";
+import ProductDetailPage from "../pages/products/ProductDetailPage";
 
 function CartPage() {
   return <div className="mx-auto max-w-7xl px-4 py-10">Cart page</div>;
@@ -34,6 +32,7 @@ export default function AppRoutes() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/addresses" element={<AddressesPage />} />
