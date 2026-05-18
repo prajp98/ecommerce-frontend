@@ -5,17 +5,11 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ProductsPage from "../pages/products/ProductsPage";
 import ProductDetailPage from "../pages/products/ProductDetailPage";
-
-function CartPage() {
-  return <div className="mx-auto max-w-7xl px-4 py-10">Cart page</div>;
-}
+import CartPage from "../pages/cart/CartPage";
+import AddressesPage from "../pages/addresses/AddressesPage";
 
 function OrdersPage() {
   return <div className="mx-auto max-w-7xl px-4 py-10">Orders page</div>;
-}
-
-function AddressesPage() {
-  return <div className="mx-auto max-w-7xl px-4 py-10">Addresses page</div>;
 }
 
 function AdminPage() {
