@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 type CartItem = {
   cartItemId: number;
@@ -22,6 +23,7 @@ type CartResponseWrapper = {
 export default function CartPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { refreshCartCount } = useCart();
 
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,7 @@ export default function CartPage() {
 
       const response = await api.get<CartResponseWrapper>("/cart/me");
       setItems(response.data.data);
+      await refreshCartCount();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to load cart");
     } finally {
@@ -66,6 +69,7 @@ export default function CartPage() {
 
       await api.put(`/cart/items/${cartItemId}`, { quantity });
       await fetchCart();
+      await refreshCartCount();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to update item");
     } finally {
@@ -80,6 +84,7 @@ export default function CartPage() {
 
       await api.delete(`/cart/items/${cartItemId}`);
       await fetchCart();
+      await refreshCartCount();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to remove item");
     } finally {
@@ -188,7 +193,9 @@ export default function CartPage() {
                     disabled={removingItemId === item.cartItemId}
                     className="text-sm font-medium text-red-600 transition hover:text-red-700 disabled:opacity-60"
                   >
-                    {removingItemId === item.cartItemId ? "Removing..." : "Remove"}
+                    {removingItemId === item.cartItemId
+                      ? "Removing..."
+                      : "Remove"}
                   </button>
                 </div>
               </article>
@@ -210,10 +217,10 @@ export default function CartPage() {
             </div>
 
             <Link
-                to="/checkout"
-                className="mt-6 inline-flex w-full justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-                >
-                Proceed to checkout
+              to="/checkout"
+              className="mt-6 inline-flex w-full justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+            >
+              Proceed to checkout
             </Link>
 
             <Link

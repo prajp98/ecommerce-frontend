@@ -7,6 +7,7 @@ import type {
   ProductImage,
   ProductImageListResponse,
 } from "../../types/product";
+import { useCart } from "../../context/CartContext";
 
 type ProductResponseWrapper = {
   timestamp: string;
@@ -26,6 +27,7 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { refreshCartCount } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<ProductImage[]>([]);
@@ -83,6 +85,7 @@ export default function ProductDetailPage() {
         productId,
         quantity: 1,
       });
+      await refreshCartCount();
 
       setSuccess("Added to cart successfully");
     } catch (err: any) {
