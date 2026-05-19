@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
 import { useAuth } from "../../context/AuthContext";
-import { api } from "../../lib/api";
+import { useCart } from "../../context/CartContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
+  const { cartCount } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
 
   const handleLogout = () => {
     logout();
-    setCartCount(0);
     setMobileOpen(false);
     navigate("/login");
   };
@@ -22,31 +21,6 @@ export default function Navbar() {
     }`;
 
   const closeMobileMenu = () => setMobileOpen(false);
-
-  useEffect(() => {
-    const fetchCartCount = async () => {
-      if (!isAuthenticated) {
-        setCartCount(0);
-        return;
-      }
-
-      try {
-        const response = await api.get("/cart/me");
-        const items = response.data.data || [];
-
-        const count = items.reduce(
-          (sum: number, item: { quantity: number }) => sum + item.quantity,
-          0
-        );
-
-        setCartCount(count);
-      } catch {
-        setCartCount(0);
-      }
-    };
-
-    fetchCartCount();
-  }, [isAuthenticated]);
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur">
