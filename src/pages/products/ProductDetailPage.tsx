@@ -2,25 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import type {
   Product,
   ProductImage,
   ProductImageListResponse,
 } from "../../types/product";
-import { useCart } from "../../context/CartContext";
 
 type ProductResponseWrapper = {
   timestamp: string;
   status: number;
   message: string;
   data: Product;
-};
-
-type CartAddResponse = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: unknown;
 };
 
 export default function ProductDetailPage() {
@@ -57,7 +50,9 @@ export default function ProductDetailPage() {
         setImages(imageData);
 
         const primaryImage = imageData.find((img) => img.primaryImage);
-        setSelectedImageUrl(primaryImage?.imageUrl || imageData[0]?.imageUrl || "");
+        setSelectedImageUrl(
+          primaryImage?.imageUrl || imageData[0]?.imageUrl || ""
+        );
       } catch (err: any) {
         setError(err?.response?.data?.message || "Failed to load product");
       } finally {
@@ -85,8 +80,8 @@ export default function ProductDetailPage() {
         productId,
         quantity: 1,
       });
-      await refreshCartCount();
 
+      await refreshCartCount();
       setSuccess("Added to cart successfully");
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to add to cart");
@@ -117,7 +112,10 @@ export default function ProductDetailPage() {
           {error || "Product not found"}
         </div>
         <div className="mt-6">
-          <Link to="/products" className="text-sm font-medium text-black underline">
+          <Link
+            to="/products"
+            className="text-sm font-medium text-black underline"
+          >
             Back to products
           </Link>
         </div>
