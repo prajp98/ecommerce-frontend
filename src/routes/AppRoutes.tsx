@@ -13,6 +13,7 @@ import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import CategoriesAdminPage from "../pages/admin/CategoriesAdminPage";
 import ProductsAdminPage from "../pages/admin/ProductsAdminPage";
 import OrdersAdminPage from "../pages/admin/OrdersAdminPage";
+import ProductImagesAdminPage from "../pages/admin/ProductImagesAdminPage";
 
 function NotFoundPage() {
   return <div className="mx-auto max-w-7xl px-4 py-10">Page not found</div>;
@@ -30,11 +31,12 @@ export default function AppRoutes() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/addresses" element={<AddressesPage />} />
         <Route path="/admin" element={<AdminDashboardPage />}>
-          <Route index element={<div>Select a section from the menu.</div>} />
-          <Route path="categories" element={<CategoriesAdminPage />} />
-          <Route path="products" element={<ProductsAdminPage />} />
-          <Route path="orders" element={<OrdersAdminPage />} />
-        </Route>
+        <Route index element={<div>Select a section from the menu.</div>} />
+        <Route path="categories" element={<CategoriesAdminPage />} />
+        <Route path="products" element={<ProductsAdminPage />} />
+        <Route path="images" element={<ProductImagesAdminPage />} />
+        <Route path="orders" element={<OrdersAdminPage />} />
+      </Route>
       </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
