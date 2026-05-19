@@ -37,6 +37,12 @@ export default function AdminDashboardPage() {
             >
               Orders
             </Link>
+            <Link
+              to="/admin/images"
+              className="block rounded-2xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+            >
+              Product Images
+            </Link>
           </nav>
         </aside>
 
