@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Card from "../../components/ui/Card";
+import Alert from "../../components/ui/Alert";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -55,30 +59,25 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-140px)] max-w-md items-center px-4 py-12">
-      <div className="w-full rounded-3xl bg-white p-8 shadow-sm">
+      <Card>
         <h2 className="text-2xl font-bold tracking-tight text-black">Login</h2>
         <p className="mt-2 text-sm text-gray-500">
           Welcome back. Sign in to continue.
         </p>
 
-        {error && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {error}
-          </div>
-        )}
+        {error && <Alert variant="error">{error}</Alert>}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Email
             </label>
-            <input
+            <Input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
             />
           </div>
 
@@ -86,23 +85,18 @@ export default function LoginPage() {
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Password
             </label>
-            <input
+            <Input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-2xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
-          >
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
-          </button>
+          </Button>
         </form>
 
         <p className="mt-6 text-sm text-gray-600">
@@ -111,7 +105,7 @@ export default function LoginPage() {
             Register
           </Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 }
