@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
+import Alert from "../../components/ui/Alert";
+import EmptyState from "../../components/ui/EmptyState";
+import PageHeader from "../../components/ui/PageHeader";
 
 type OrderItem = {
   orderItemId: number;
@@ -72,57 +77,48 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="space-y-4">
           <div className="h-8 w-40 animate-pulse rounded bg-gray-200" />
           <div className="h-40 animate-pulse rounded-3xl bg-gray-200" />
           <div className="h-40 animate-pulse rounded-3xl bg-gray-200" />
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-black">Orders</h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Track your past orders and view details.
-          </p>
-        </div>
-
-        <button
-          onClick={fetchOrders}
-          className="rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-        >
-          Refresh
-        </button>
-      </div>
+      <PageHeader
+        title="Orders"
+        subtitle="Track your past orders and view details."
+        action={
+          <Button variant="secondary" onClick={fetchOrders}>
+            Refresh
+          </Button>
+        }
+      />
 
       {error && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
+        <div className="mb-6">
+          <Alert variant="error">{error}</Alert>
         </div>
       )}
 
       {orders.length === 0 ? (
-        <div className="rounded-3xl bg-white p-10 text-center shadow-sm">
-          <p className="text-gray-500">You have no orders yet.</p>
-          <Link
-            to="/products"
-            className="mt-5 inline-flex rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-          >
-            Start shopping
-          </Link>
-        </div>
+        <EmptyState
+          title="You have no orders yet"
+          description="Start shopping and your orders will appear here."
+          action={
+            <Link to="/products">
+              <Button>Start shopping</Button>
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <article
-              key={order.orderId}
-              className="rounded-3xl bg-white p-6 shadow-sm"
-            >
+            <Card key={order.orderId}>
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
@@ -148,8 +144,9 @@ export default function OrdersPage() {
 
                   <p className="mt-2 text-sm text-gray-600">
                     {order.addressLine1}
-                    {order.addressLine2 ? `, ${order.addressLine2}` : ""}, {order.city},{" "}
-                    {order.state} - {order.zipCode}, {order.country}
+                    {order.addressLine2 ? `, ${order.addressLine2}` : ""},{" "}
+                    {order.city}, {order.state} - {order.zipCode},{" "}
+                    {order.country}
                   </p>
 
                   <p className="mt-2 text-sm text-gray-600">
@@ -159,7 +156,9 @@ export default function OrdersPage() {
 
                 <div className="text-left md:text-right">
                   <p className="text-sm text-gray-500">Total</p>
-                  <p className="text-2xl font-bold text-black">₹{order.totalAmount}</p>
+                  <p className="text-2xl font-bold text-black">
+                    ₹{order.totalAmount}
+                  </p>
                 </div>
               </div>
 
@@ -182,7 +181,9 @@ export default function OrdersPage() {
                       className="flex flex-col gap-2 rounded-2xl bg-gray-50 p-4 md:flex-row md:items-center md:justify-between"
                     >
                       <div>
-                        <p className="font-medium text-black">{item.productName}</p>
+                        <p className="font-medium text-black">
+                          {item.productName}
+                        </p>
                         <p className="text-sm text-gray-500">
                           Qty: {item.quantity} × ₹{item.priceAtPurchase}
                         </p>
@@ -194,7 +195,7 @@ export default function OrdersPage() {
                   ))}
                 </div>
               )}
-            </article>
+            </Card>
           ))}
         </div>
       )}
