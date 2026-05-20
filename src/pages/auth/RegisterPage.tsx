@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Card from "../../components/ui/Card";
+import Alert from "../../components/ui/Alert";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -14,9 +18,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -29,7 +31,11 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.password.trim()
+    ) {
       setError("Name, email and password are required");
       return;
     }
@@ -61,30 +67,27 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-140px)] max-w-md items-center px-4 py-12">
-      <div className="w-full rounded-3xl bg-white p-8 shadow-sm">
-        <h2 className="text-2xl font-bold tracking-tight text-black">Create account</h2>
+      <Card>
+        <h2 className="text-2xl font-bold tracking-tight text-black">
+          Create account
+        </h2>
         <p className="mt-2 text-sm text-gray-500">
           Start shopping by creating your account.
         </p>
 
-        {error && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {error}
-          </div>
-        )}
+        {error && <Alert variant="error">{error}</Alert>}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Name
             </label>
-            <input
+            <Input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="Your name"
-              className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
             />
           </div>
 
@@ -92,13 +95,12 @@ export default function RegisterPage() {
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Email
             </label>
-            <input
+            <Input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
             />
           </div>
 
@@ -106,23 +108,18 @@ export default function RegisterPage() {
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Password
             </label>
-            <input
+            <Input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               placeholder="At least 8 characters"
-              className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-2xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
-          >
+          <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating account..." : "Register"}
-          </button>
+          </Button>
         </form>
 
         <p className="mt-6 text-sm text-gray-600">
@@ -131,7 +128,7 @@ export default function RegisterPage() {
             Login
           </Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 }
