@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
+import Alert from "../../components/ui/Alert";
+import EmptyState from "../../components/ui/EmptyState";
+import PageHeader from "../../components/ui/PageHeader";
 
 type CartItem = {
   cartItemId: number;
@@ -38,13 +43,6 @@ type AddressResponseWrapper = {
   data: Address[];
 };
 
-type OrderResponseWrapper = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: unknown;
-};
-
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -74,17 +72,17 @@ export default function CheckoutPage() {
         api.get<AddressResponseWrapper>("/addresses/me"),
       ]);
 
-      setCartItems(cartResponse.data.data);
-      setAddresses(addressResponse.data.data);
+      const cartData = cartResponse.data.data;
+      const addressData = addressResponse.data.data;
 
-      const defaultAddress = addressResponse.data.data.find(
-        (address) => address.defaultAddress
-      );
+      setCartItems(cartData);
+      setAddresses(addressData);
 
+      const defaultAddress = addressData.find((address) => address.defaultAddress);
       if (defaultAddress) {
         setSelectedAddressId(defaultAddress.id);
-      } else if (addressResponse.data.data.length > 0) {
-        setSelectedAddressId(addressResponse.data.data[0].id);
+      } else if (addressData.length > 0) {
+        setSelectedAddressId(addressData[0].id);
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to load checkout data");
@@ -119,7 +117,7 @@ export default function CheckoutPage() {
     try {
       setPlacingOrder(true);
 
-      const response = await api.post<OrderResponseWrapper>("/orders", {
+      await api.post("/orders", {
         addressId: selectedAddressId,
         paymentMethod,
       });
@@ -138,62 +136,64 @@ export default function CheckoutPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="space-y-4">
           <div className="h-8 w-40 animate-pulse rounded bg-gray-200" />
           <div className="h-32 animate-pulse rounded-3xl bg-gray-200" />
           <div className="h-32 animate-pulse rounded-3xl bg-gray-200" />
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Checkout</h1>
-        <p className="mt-2 text-sm text-gray-500">
-          Choose your address and place the order.
-        </p>
-      </div>
+      <PageHeader
+        title="Checkout"
+        subtitle="Choose your address and place the order."
+        action={
+          <Link to="/cart">
+            <Button variant="secondary">Back to cart</Button>
+          </Link>
+        }
+      />
 
       {error && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
+        <div className="mb-6">
+          <Alert variant="error">{error}</Alert>
         </div>
       )}
 
       {success && (
-        <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-          {success}
+        <div className="mb-6">
+          <Alert variant="success">{success}</Alert>
         </div>
       )}
 
       {cartItems.length === 0 ? (
-        <div className="rounded-3xl bg-white p-10 text-center shadow-sm">
-          <p className="text-gray-500">Your cart is empty.</p>
-          <Link
-            to="/products"
-            className="mt-5 inline-flex rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-          >
-            Browse products
-          </Link>
-        </div>
+        <EmptyState
+          title="Your cart is empty"
+          description="Add products to your cart before checkout."
+          action={
+            <Link to="/products">
+              <Button>Browse products</Button>
+            </Link>
+          }
+        />
       ) : (
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-6">
-            <div className="rounded-3xl bg-white p-6 shadow-sm">
+            <Card>
               <h2 className="text-lg font-semibold text-black">Shipping address</h2>
 
               {addresses.length === 0 ? (
-                <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-                  No addresses found. Please add one first.
-                  <div className="mt-3">
-                    <Link
-                      to="/addresses"
-                      className="inline-flex rounded-2xl bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
-                    >
-                      Add address
+                <div className="mt-4">
+                  <Alert variant="info">
+                    No addresses found. Please add one first.
+                  </Alert>
+                  <div className="mt-4">
+                    <Link to="/addresses">
+                      <Button>Add address</Button>
                     </Link>
                   </div>
                 </div>
@@ -226,16 +226,17 @@ export default function CheckoutPage() {
                         </div>
                         <p className="mt-1 text-sm text-gray-600">
                           {address.line2 && `${address.line2}, `}
-                          {address.city}, {address.state} - {address.zipCode}, {address.country}
+                          {address.city}, {address.state} - {address.zipCode},{" "}
+                          {address.country}
                         </p>
                       </div>
                     </label>
                   ))}
                 </div>
               )}
-            </div>
+            </Card>
 
-            <div className="rounded-3xl bg-white p-6 shadow-sm">
+            <Card>
               <h2 className="text-lg font-semibold text-black">Payment method</h2>
 
               <div className="mt-4 space-y-3">
@@ -246,7 +247,9 @@ export default function CheckoutPage() {
                     checked={paymentMethod === "COD"}
                     onChange={() => setPaymentMethod("COD")}
                   />
-                  <span className="text-sm font-medium text-black">Cash on Delivery</span>
+                  <span className="text-sm font-medium text-black">
+                    Cash on Delivery
+                  </span>
                 </label>
 
                 <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-gray-200 p-4">
@@ -259,10 +262,10 @@ export default function CheckoutPage() {
                   <span className="text-sm font-medium text-black">UPI</span>
                 </label>
               </div>
-            </div>
+            </Card>
           </div>
 
-          <aside className="h-fit rounded-3xl bg-white p-6 shadow-sm">
+          <Card>
             <h2 className="text-lg font-semibold text-black">Order summary</h2>
 
             <div className="mt-4 space-y-3 text-sm">
@@ -278,27 +281,26 @@ export default function CheckoutPage() {
                 <span>Shipping</span>
                 <span>₹0</span>
               </div>
-              <div className="border-t pt-3 flex items-center justify-between text-base font-semibold text-black">
+              <div className="flex items-center justify-between border-t pt-3 text-base font-semibold text-black">
                 <span>Total</span>
                 <span>₹{subtotal}</span>
               </div>
             </div>
 
-            <button
+            <Button
+              className="mt-6 w-full"
               onClick={handlePlaceOrder}
               disabled={placingOrder || addresses.length === 0}
-              className="mt-6 w-full rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {placingOrder ? "Placing order..." : "Place order"}
-            </button>
+            </Button>
 
-            <Link
-              to="/cart"
-              className="mt-3 inline-flex w-full justify-center rounded-2xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-            >
-              Back to cart
+            <Link to="/cart" className="mt-3 block">
+              <Button variant="secondary" className="w-full">
+                Back to cart
+              </Button>
             </Link>
-          </aside>
+          </Card>
         </div>
       )}
     </section>
