@@ -3,6 +3,11 @@ import { Link, useNavigate, useParams } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Alert from "../../components/ui/Alert";
+import EmptyState from "../../components/ui/EmptyState";
+import PageHeader from "../../components/ui/PageHeader";
 import type {
   Product,
   ProductImage,
@@ -50,9 +55,7 @@ export default function ProductDetailPage() {
         setImages(imageData);
 
         const primaryImage = imageData.find((img) => img.primaryImage);
-        setSelectedImageUrl(
-          primaryImage?.imageUrl || imageData[0]?.imageUrl || ""
-        );
+        setSelectedImageUrl(primaryImage?.imageUrl || imageData[0]?.imageUrl || "");
       } catch (err: any) {
         setError(err?.response?.data?.message || "Failed to load product");
       } finally {
@@ -92,7 +95,7 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid gap-8 md:grid-cols-2">
           <div className="h-96 animate-pulse rounded-3xl bg-gray-200" />
           <div className="space-y-4">
@@ -101,34 +104,43 @@ export default function ProductDetailPage() {
             <div className="h-28 animate-pulse rounded-2xl bg-gray-200" />
           </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-600">
-          {error || "Product not found"}
-        </div>
+      <section className="mx-auto max-w-7xl px-4 py-10">
+        <Alert variant="error">{error || "Product not found"}</Alert>
+
         <div className="mt-6">
+          <Link to="/products" className="text-sm font-medium text-black underline">
+            Back to products
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-10">
+      <PageHeader
+        title={product.name}
+        subtitle={product.categoryName}
+        action={
           <Link
             to="/products"
             className="text-sm font-medium text-black underline"
           >
             Back to products
           </Link>
-        </div>
-      </div>
-    );
-  }
+        }
+      />
 
-  return (
-    <section className="mx-auto max-w-7xl px-4 py-10">
       <div className="grid gap-10 md:grid-cols-2">
         <div>
-          <div className="overflow-hidden rounded-3xl bg-white shadow-sm">
-            <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200">
+          <Card>
+            <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200">
               {selectedImageUrl ? (
                 <img
                   src={selectedImageUrl}
@@ -141,7 +153,7 @@ export default function ProductDetailPage() {
                 </div>
               )}
             </div>
-          </div>
+          </Card>
 
           {images.length > 1 && (
             <div className="mt-4 flex gap-3 overflow-x-auto">
@@ -167,60 +179,58 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="flex flex-col justify-center">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
-            {product.categoryName}
-          </p>
+          <Card>
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
+              {product.categoryName}
+            </p>
 
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-black">
-            {product.name}
-          </h1>
+            <h1 className="mt-3 text-4xl font-bold tracking-tight text-black">
+              {product.name}
+            </h1>
 
-          <p className="mt-4 text-2xl font-bold text-black">₹{product.price}</p>
+            <p className="mt-4 text-2xl font-bold text-black">₹{product.price}</p>
 
-          <div className="mt-4">
-            <span
-              className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                product.stock > 0
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {product.stock > 0 ? `In stock: ${product.stock}` : "Out of stock"}
-            </span>
-          </div>
-
-          <p className="mt-6 text-base leading-7 text-gray-600">
-            {product.description}
-          </p>
-
-          {success && (
-            <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-              {success}
+            <div className="mt-4">
+              <span
+                className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                  product.stock > 0
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {product.stock > 0 ? `In stock: ${product.stock}` : "Out of stock"}
+              </span>
             </div>
-          )}
 
-          {error && (
-            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              {error}
+            <p className="mt-6 text-base leading-7 text-gray-600">
+              {product.description}
+            </p>
+
+            {success && (
+              <div className="mt-6">
+                <Alert variant="success">{success}</Alert>
+              </div>
+            )}
+
+            {error && (
+              <div className="mt-6">
+                <Alert variant="error">{error}</Alert>
+              </div>
+            )}
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button
+                onClick={handleAddToCart}
+                disabled={addingToCart || product.stock <= 0}
+              >
+                {addingToCart ? "Adding..." : "Add to cart"}
+              </Button>
+
+              <Link to="/cart">
+                <Button variant="secondary">Go to cart</Button>
+              </Link>
             </div>
-          )}
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button
-              onClick={handleAddToCart}
-              disabled={addingToCart || product.stock <= 0}
-              className="rounded-2xl bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {addingToCart ? "Adding..." : "Add to cart"}
-            </button>
-
-            <Link
-              to="/products"
-              className="rounded-2xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-            >
-              Back to products
-            </Link>
-          </div>
+          </Card>
         </div>
       </div>
     </section>
