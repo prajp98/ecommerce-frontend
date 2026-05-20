@@ -3,6 +3,11 @@ import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import Button from "../../components/ui/Button";
+import Card from "../../components/ui/Card";
+import Alert from "../../components/ui/Alert";
+import EmptyState from "../../components/ui/EmptyState";
+import PageHeader from "../../components/ui/PageHeader";
 
 type CartItem = {
   cartItemId: number;
@@ -94,58 +99,49 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="space-y-4">
           <div className="h-8 w-40 animate-pulse rounded bg-gray-200" />
           <div className="h-40 animate-pulse rounded-3xl bg-gray-200" />
           <div className="h-40 animate-pulse rounded-3xl bg-gray-200" />
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-black">Cart</h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Review your items before checkout.
-          </p>
-        </div>
-
-        <button
-          onClick={fetchCart}
-          className="rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-        >
-          Refresh
-        </button>
-      </div>
+      <PageHeader
+        title="Cart"
+        subtitle="Review your items before checkout."
+        action={
+          <Button variant="secondary" onClick={fetchCart}>
+            Refresh
+          </Button>
+        }
+      />
 
       {error && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
+        <div className="mb-6">
+          <Alert variant="error">{error}</Alert>
         </div>
       )}
 
       {items.length === 0 ? (
-        <div className="rounded-3xl bg-white p-10 text-center shadow-sm">
-          <p className="text-gray-500">Your cart is empty.</p>
-          <Link
-            to="/products"
-            className="mt-5 inline-flex rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-          >
-            Continue shopping
-          </Link>
-        </div>
+        <EmptyState
+          title="Your cart is empty"
+          description="Add products to your cart to continue shopping."
+          action={
+            <Link to="/products">
+              <Button>Continue shopping</Button>
+            </Link>
+          }
+        />
       ) : (
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           <div className="space-y-4">
             {items.map((item) => (
-              <article
-                key={item.cartItemId}
-                className="rounded-3xl bg-white p-5 shadow-sm"
-              >
+              <Card key={item.cartItemId}>
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-black">
@@ -198,11 +194,11 @@ export default function CartPage() {
                       : "Remove"}
                   </button>
                 </div>
-              </article>
+              </Card>
             ))}
           </div>
 
-          <aside className="h-fit rounded-3xl bg-white p-6 shadow-sm">
+          <Card>
             <h3 className="text-lg font-semibold text-black">Order summary</h3>
 
             <div className="mt-4 space-y-3 text-sm">
@@ -216,20 +212,16 @@ export default function CartPage() {
               </div>
             </div>
 
-            <Link
-              to="/checkout"
-              className="mt-6 inline-flex w-full justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-            >
-              Proceed to checkout
+            <Link to="/checkout" className="mt-6 block">
+              <Button className="w-full">Proceed to checkout</Button>
             </Link>
 
-            <Link
-              to="/products"
-              className="mt-3 inline-flex w-full justify-center rounded-2xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-            >
-              Continue shopping
+            <Link to="/products" className="mt-3 block">
+              <Button variant="secondary" className="w-full">
+                Continue shopping
+              </Button>
             </Link>
-          </aside>
+          </Card>
         </div>
       )}
     </section>
