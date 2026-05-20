@@ -1,6 +1,13 @@
-import { Link, Outlet } from "react-router";
+import { NavLink, Outlet } from "react-router";
 
 export default function AdminDashboardPage() {
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `block rounded-2xl px-4 py-3 text-sm font-medium transition ${
+      isActive
+        ? "bg-black text-white"
+        : "text-gray-700 hover:bg-gray-100"
+    }`;
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-10">
       <div className="mb-8">
@@ -19,30 +26,25 @@ export default function AdminDashboardPage() {
           </h2>
 
           <nav className="mt-5 space-y-2">
-            <Link
-              to="/admin/categories"
-              className="block rounded-2xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-            >
+            <NavLink to="/admin" end className={linkClass}>
+              Dashboard
+            </NavLink>
+
+            <NavLink to="/admin/categories" className={linkClass}>
               Categories
-            </Link>
-            <Link
-              to="/admin/products"
-              className="block rounded-2xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-            >
+            </NavLink>
+
+            <NavLink to="/admin/products" className={linkClass}>
               Products
-            </Link>
-            <Link
-              to="/admin/orders"
-              className="block rounded-2xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-            >
-              Orders
-            </Link>
-            <Link
-              to="/admin/images"
-              className="block rounded-2xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-            >
+            </NavLink>
+
+            <NavLink to="/admin/images" className={linkClass}>
               Product Images
-            </Link>
+            </NavLink>
+
+            <NavLink to="/admin/orders" className={linkClass}>
+              Orders
+            </NavLink>
           </nav>
         </aside>
 
