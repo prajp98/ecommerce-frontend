@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Card from "../../components/ui/Card";
+import Alert from "../../components/ui/Alert";
+import PageHeader from "../../components/ui/PageHeader";
 
 type Category = {
   id: number;
@@ -65,7 +70,7 @@ export default function ProductsAdminPage() {
       ]);
 
       setProducts(productsResponse.data.data);
-      setCategories(categoriesResponse.data.data.filter((c) => c.id));
+      setCategories(categoriesResponse.data.data);
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to load products");
     } finally {
@@ -169,21 +174,24 @@ export default function ProductsAdminPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-black">Products</h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Create, update, activate, and deactivate products.
-        </p>
-      </div>
+      <PageHeader
+        title="Products"
+        subtitle="Create, update, activate, and deactivate products."
+        action={
+          <Button variant="secondary" onClick={fetchData}>
+            Refresh
+          </Button>
+        }
+      />
 
       {error && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
+        <div className="mb-6">
+          <Alert variant="error">{error}</Alert>
         </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <div className="rounded-3xl border border-gray-200 bg-white p-6">
+        <Card>
           <h3 className="text-lg font-semibold text-black">
             {editingId ? "Edit product" : "Add product"}
           </h3>
@@ -193,13 +201,12 @@ export default function ProductsAdminPage() {
               <label className="mb-2 block text-sm font-medium text-gray-700">
                 Name
               </label>
-              <input
+              <Input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Example: iPhone 15"
-                className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
               />
             </div>
 
@@ -222,13 +229,12 @@ export default function ProductsAdminPage() {
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Price
                 </label>
-                <input
+                <Input
                   type="number"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="49999"
-                  className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
                 />
               </div>
 
@@ -236,13 +242,12 @@ export default function ProductsAdminPage() {
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Stock
                 </label>
-                <input
+                <Input
                   type="number"
                   name="stock"
                   value={formData.stock}
                   onChange={handleChange}
                   placeholder="10"
-                  className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
                 />
               </div>
             </div>
@@ -267,36 +272,22 @@ export default function ProductsAdminPage() {
             </div>
 
             <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
-              >
+              <Button type="submit" disabled={saving}>
                 {saving ? "Saving..." : editingId ? "Update" : "Create"}
-              </button>
+              </Button>
 
               {editingId && (
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="rounded-2xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
-                >
+                <Button type="button" variant="secondary" onClick={resetForm}>
                   Cancel
-                </button>
+                </Button>
               )}
             </div>
           </form>
-        </div>
+        </Card>
 
-        <div className="rounded-3xl border border-gray-200 bg-white p-6">
+        <Card>
           <div className="mb-5 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-black">Product list</h3>
-            <button
-              onClick={fetchData}
-              className="rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-            >
-              Refresh
-            </button>
           </div>
 
           {loading ? (
@@ -340,26 +331,23 @@ export default function ProductsAdminPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      <button
-                        onClick={() => handleEdit(product)}
-                        className="rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-                      >
+                      <Button variant="secondary" onClick={() => handleEdit(product)}>
                         Edit
-                      </button>
+                      </Button>
 
-                      <button
+                      <Button
+                        variant="secondary"
                         onClick={() => handleToggleActive(product)}
-                        className="rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                       >
                         {product.active ? "Deactivate" : "Activate"}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );
