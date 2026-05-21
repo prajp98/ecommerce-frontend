@@ -7,6 +7,7 @@ import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
+import ProductImage from "../../components/product/ProductImage";
 
 type Category = {
   id: number;
@@ -212,17 +213,10 @@ export default function ProductsPage() {
             <Card key={product.id}>
               <article className="overflow-hidden">
                 <div className="h-48 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200">
-                  {product.primaryImageUrl ? (
-                    <img
-                      src={product.primaryImageUrl}
-                      alt={product.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-gray-400">
-                      No image available
-                    </div>
-                  )}
+                  <ProductImage
+                    src={product.primaryImageUrl}
+                    alt={product.name}
+                  />
                 </div>
 
                 <div className="pt-5">
