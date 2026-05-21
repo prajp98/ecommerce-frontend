@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { api } from "../../lib/api";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -20,6 +21,7 @@ type Product = {
   categoryId: number;
   categoryName: string;
   active: boolean;
+  primaryImageUrl?: string | null;
 };
 
 type ProductResponseWrapper = {
@@ -94,7 +96,9 @@ export default function ProductsAdminPage() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
 
@@ -271,6 +275,10 @@ export default function ProductsAdminPage() {
               </select>
             </div>
 
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+              Product images are managed separately in the Product Images section.
+            </div>
+
             <div className="flex gap-3">
               <Button type="submit" disabled={saving}>
                 {saving ? "Saving..." : editingId ? "Update" : "Create"}
@@ -288,6 +296,10 @@ export default function ProductsAdminPage() {
         <Card>
           <div className="mb-5 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-black">Product list</h3>
+
+            <Link to="/admin/images">
+              <Button variant="secondary">Manage images</Button>
+            </Link>
           </div>
 
           {loading ? (
@@ -302,32 +314,48 @@ export default function ProductsAdminPage() {
                   className="rounded-2xl border border-gray-200 p-4"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h4 className="text-base font-semibold text-black">
-                          {product.name}
-                        </h4>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${
-                            product.active
-                              ? "bg-green-100 text-green-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {product.active ? "Active" : "Inactive"}
-                        </span>
+                    <div className="flex gap-4">
+                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-100">
+                        {product.primaryImageUrl ? (
+                          <img
+                            src={product.primaryImageUrl}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-gray-400">
+                            No image
+                          </div>
+                        )}
                       </div>
 
-                      <p className="mt-2 text-sm text-gray-600">
-                        {product.description || "No description"}
-                      </p>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h4 className="text-base font-semibold text-black">
+                            {product.name}
+                          </h4>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-medium ${
+                              product.active
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {product.active ? "Active" : "Inactive"}
+                          </span>
+                        </div>
 
-                      <p className="mt-2 text-sm text-gray-500">
-                        Category: {product.categoryName}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Price: ₹{product.price} | Stock: {product.stock}
-                      </p>
+                        <p className="mt-2 text-sm text-gray-600">
+                          {product.description || "No description"}
+                        </p>
+
+                        <p className="mt-2 text-sm text-gray-500">
+                          Category: {product.categoryName}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Price: ₹{product.price} | Stock: {product.stock}
+                        </p>
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap gap-3">
