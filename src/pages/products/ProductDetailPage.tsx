@@ -7,9 +7,10 @@ import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
+import ProductImage from "../../components/product/ProductImage";
 import type {
   Product,
-  ProductImage,
+  ProductImage as ProductImageType,
   ProductImageListResponse,
 } from "../../types/product";
 
@@ -27,7 +28,7 @@ export default function ProductDetailPage() {
   const { refreshCartCount } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [images, setImages] = useState<ProductImage[]>([]);
+  const [images, setImages] = useState<ProductImageType[]>([]);
   const [primaryImageUrl, setPrimaryImageUrl] = useState<string>("");
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -144,17 +145,11 @@ export default function ProductDetailPage() {
         <div>
           <Card>
             <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200">
-              {(selectedImageUrl || primaryImageUrl) ? (
-                <img
-                  src={selectedImageUrl || primaryImageUrl}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-sm text-gray-400">
-                  No image available
-                </div>
-              )}
+              <ProductImage
+                src={selectedImageUrl || primaryImageUrl}
+                alt={product.name}
+                fallbackText="No image available"
+              />
             </div>
           </Card>
 
