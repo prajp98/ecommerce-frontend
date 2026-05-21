@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../lib/api";
 import Button from "../../components/ui/Button";
@@ -24,6 +24,7 @@ type Product = {
   categoryId: number;
   categoryName: string;
   active: boolean;
+  primaryImageUrl?: string | null;
 };
 
 type ProductPageResponse = {
@@ -60,12 +61,6 @@ export default function ProductsPage() {
   const [page, setPage] = useState(0);
   const [size] = useState(8);
   const [totalPages, setTotalPages] = useState(0);
-
-  const query = useMemo(() => {
-    if (keyword.trim()) return "search";
-    if (selectedCategoryId) return "category";
-    return "active";
-  }, [keyword, selectedCategoryId]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -214,49 +209,58 @@ export default function ProductsPage() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
-            <Card
-              key={product.id}
-              children={
-                <article className="overflow-hidden">
-                  <div className="h-48 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200" />
-                  <div className="pt-5">
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500">
-                      {product.categoryName}
-                    </p>
-                    <h3 className="mt-2 line-clamp-1 text-lg font-semibold text-black">
-                      {product.name}
-                    </h3>
-                    <p className="mt-2 line-clamp-2 text-sm text-gray-600">
-                      {product.description}
-                    </p>
-
-                    <div className="mt-4 flex items-center justify-between">
-                      <span className="text-lg font-bold text-black">
-                        ₹{product.price}
-                      </span>
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${
-                          product.stock > 0
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {product.stock > 0
-                          ? `Stock: ${product.stock}`
-                          : "Out of stock"}
-                      </span>
+            <Card key={product.id}>
+              <article className="overflow-hidden">
+                <div className="h-48 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200">
+                  {product.primaryImageUrl ? (
+                    <img
+                      src={product.primaryImageUrl}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-sm text-gray-400">
+                      No image available
                     </div>
+                  )}
+                </div>
 
-                    <Link
-                      to={`/products/${product.id}`}
-                      className="mt-4 block"
+                <div className="pt-5">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-gray-500">
+                    {product.categoryName}
+                  </p>
+
+                  <h3 className="mt-2 line-clamp-1 text-lg font-semibold text-black">
+                    {product.name}
+                  </h3>
+
+                  <p className="mt-2 line-clamp-2 text-sm text-gray-600">
+                    {product.description}
+                  </p>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-lg font-bold text-black">
+                      ₹{product.price}
+                    </span>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        product.stock > 0
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
                     >
-                      <Button className="w-full">View details</Button>
-                    </Link>
+                      {product.stock > 0
+                        ? `Stock: ${product.stock}`
+                        : "Out of stock"}
+                    </span>
                   </div>
-                </article>
-              }
-            />
+
+                  <Link to={`/products/${product.id}`} className="mt-4 block">
+                    <Button className="w-full">View details</Button>
+                  </Link>
+                </div>
+              </article>
+            </Card>
           ))}
         </div>
       )}
