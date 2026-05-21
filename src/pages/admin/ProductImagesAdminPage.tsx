@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
@@ -54,9 +53,11 @@ export default function ProductImagesAdminPage() {
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
-    imageUrl: "",
+    file: null as File | null,
     primaryImage: false,
   });
+
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const fetchProducts = async () => {
     try {
@@ -101,17 +102,23 @@ export default function ProductImagesAdminPage() {
     }
   }, [selectedProductId]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
+  useEffect(() => {
+    if (!formData.file) {
+      setPreviewUrl("");
+      return;
+    }
 
+    const objectUrl = URL.createObjectURL(formData.file);
+    setPreviewUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [formData.file]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox"
-          ? (e.target as HTMLInputElement).checked
-          : value,
+      file,
     }));
   };
 
@@ -124,24 +131,30 @@ export default function ProductImagesAdminPage() {
       return;
     }
 
-    if (!formData.imageUrl.trim()) {
-      setError("Image URL is required");
+    if (!formData.file) {
+      setError("Please choose an image file");
       return;
     }
 
     try {
       setSaving(true);
 
+      const form = new FormData();
+      form.append("file", formData.file);
+      form.append("primaryImage", String(formData.primaryImage));
+
       await api.post<ProductImageResponseWrapper>(
-        `/products/${selectedProductId}/images`,
+        `/products/${selectedProductId}/images/upload`,
+        form,
         {
-          imageUrl: formData.imageUrl.trim(),
-          primaryImage: formData.primaryImage,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       setFormData({
-        imageUrl: "",
+        file: null,
         primaryImage: false,
       });
 
@@ -184,8 +197,6 @@ export default function ProductImagesAdminPage() {
       setSettingPrimaryId(null);
     }
   };
-
-  const currentPreview = formData.imageUrl.trim();
 
   return (
     <div>
@@ -231,32 +242,35 @@ export default function ProductImagesAdminPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                Image URL
+                Image file
               </label>
-              <Input
-                type="text"
-                name="imageUrl"
-                value={formData.imageUrl}
-                onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-black"
               />
             </div>
 
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input
                 type="checkbox"
-                name="primaryImage"
                 checked={formData.primaryImage}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    primaryImage: e.target.checked,
+                  }))
+                }
               />
               Set as primary image
             </label>
 
-            {currentPreview && (
+            {previewUrl && (
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
                 <div className="aspect-square">
                   <ProductImage
-                    src={currentPreview}
+                    src={previewUrl}
                     alt="Preview"
                     fallbackText="Preview unavailable"
                   />
@@ -265,7 +279,7 @@ export default function ProductImagesAdminPage() {
             )}
 
             <Button type="submit" disabled={saving}>
-              {saving ? "Saving..." : "Add image"}
+              {saving ? "Saving..." : "Upload image"}
             </Button>
           </form>
         </Card>
