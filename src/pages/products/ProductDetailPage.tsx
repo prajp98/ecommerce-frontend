@@ -6,7 +6,6 @@ import { useCart } from "../../context/CartContext";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Alert from "../../components/ui/Alert";
-import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
 import type {
   Product,
@@ -29,6 +28,7 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<ProductImage[]>([]);
+  const [primaryImageUrl, setPrimaryImageUrl] = useState<string>("");
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
@@ -54,8 +54,14 @@ export default function ProductDetailPage() {
         setProduct(productData);
         setImages(imageData);
 
-        const primaryImage = imageData.find((img) => img.primaryImage);
-        setSelectedImageUrl(primaryImage?.imageUrl || imageData[0]?.imageUrl || "");
+        const resolvedPrimaryImage =
+          productData.primaryImageUrl ||
+          imageData.find((img) => img.primaryImage)?.imageUrl ||
+          imageData[0]?.imageUrl ||
+          "";
+
+        setPrimaryImageUrl(resolvedPrimaryImage);
+        setSelectedImageUrl(resolvedPrimaryImage);
       } catch (err: any) {
         setError(err?.response?.data?.message || "Failed to load product");
       } finally {
@@ -128,10 +134,7 @@ export default function ProductDetailPage() {
         title={product.name}
         subtitle={product.categoryName}
         action={
-          <Link
-            to="/products"
-            className="text-sm font-medium text-black underline"
-          >
+          <Link to="/products" className="text-sm font-medium text-black underline">
             Back to products
           </Link>
         }
@@ -141,9 +144,9 @@ export default function ProductDetailPage() {
         <div>
           <Card>
             <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200">
-              {selectedImageUrl ? (
+              {(selectedImageUrl || primaryImageUrl) ? (
                 <img
-                  src={selectedImageUrl}
+                  src={selectedImageUrl || primaryImageUrl}
                   alt={product.name}
                   className="h-full w-full object-cover"
                 />
