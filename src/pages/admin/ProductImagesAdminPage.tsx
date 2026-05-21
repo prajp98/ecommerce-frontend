@@ -6,6 +6,7 @@ import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
 import EmptyState from "../../components/ui/EmptyState";
+import ProductImage from "../../components/product/ProductImage";
 
 type Product = {
   id: number;
@@ -13,7 +14,7 @@ type Product = {
   active: boolean;
 };
 
-type ProductImage = {
+type ProductImageType = {
   id: number;
   imageUrl: string;
   primaryImage: boolean;
@@ -31,24 +32,25 @@ type ProductImageListResponseWrapper = {
   timestamp: string;
   status: number;
   message: string;
-  data: ProductImage[];
+  data: ProductImageType[];
 };
 
 type ProductImageResponseWrapper = {
   timestamp: string;
   status: number;
   message: string;
-  data: ProductImage;
+  data: ProductImageType;
 };
 
 export default function ProductImagesAdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [images, setImages] = useState<ProductImage[]>([]);
+  const [images, setImages] = useState<ProductImageType[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingImages, setLoadingImages] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [settingPrimaryId, setSettingPrimaryId] = useState<number | null>(null);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -167,6 +169,22 @@ export default function ProductImagesAdminPage() {
     }
   };
 
+  const handleSetPrimary = async (imageId: number) => {
+    try {
+      setSettingPrimaryId(imageId);
+      setError("");
+
+      await api.patch(`/products/images/${imageId}/primary`);
+      if (selectedProductId) {
+        await fetchImages(Number(selectedProductId));
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to set primary image");
+    } finally {
+      setSettingPrimaryId(null);
+    }
+  };
+
   const currentPreview = formData.imageUrl.trim();
 
   return (
@@ -237,13 +255,10 @@ export default function ProductImagesAdminPage() {
             {currentPreview && (
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
                 <div className="aspect-square">
-                  <img
+                  <ProductImage
                     src={currentPreview}
                     alt="Preview"
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
+                    fallbackText="Preview unavailable"
                   />
                 </div>
               </div>
@@ -286,15 +301,15 @@ export default function ProductImagesAdminPage() {
                 <Card key={image.id}>
                   <div className="overflow-hidden rounded-2xl bg-gray-100">
                     <div className="aspect-square">
-                      <img
+                      <ProductImage
                         src={image.imageUrl}
-                        alt="Product"
-                        className="h-full w-full object-cover"
+                        alt="Product image"
+                        fallbackText="Image unavailable"
                       />
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between gap-3">
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                     {image.primaryImage ? (
                       <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
                         Primary
@@ -305,13 +320,27 @@ export default function ProductImagesAdminPage() {
                       </span>
                     )}
 
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDelete(image.id)}
-                      disabled={deletingId === image.id}
-                    >
-                      {deletingId === image.id ? "Deleting..." : "Delete"}
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      {!image.primaryImage && (
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleSetPrimary(image.id)}
+                          disabled={settingPrimaryId === image.id}
+                        >
+                          {settingPrimaryId === image.id
+                            ? "Setting..."
+                            : "Set primary"}
+                        </Button>
+                      )}
+
+                      <Button
+                        variant="danger"
+                        onClick={() => handleDelete(image.id)}
+                        disabled={deletingId === image.id}
+                      >
+                        {deletingId === image.id ? "Deleting..." : "Delete"}
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
