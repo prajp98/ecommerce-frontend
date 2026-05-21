@@ -167,6 +167,8 @@ export default function ProductImagesAdminPage() {
     }
   };
 
+  const currentPreview = formData.imageUrl.trim();
+
   return (
     <div>
       <PageHeader
@@ -198,6 +200,7 @@ export default function ProductImagesAdminPage() {
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
                 className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-black"
+                disabled={loadingProducts}
               >
                 <option value="">Select product</option>
                 {products.map((product) => (
@@ -230,6 +233,21 @@ export default function ProductImagesAdminPage() {
               />
               Set as primary image
             </label>
+
+            {currentPreview && (
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+                <div className="aspect-square">
+                  <img
+                    src={currentPreview}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
             <Button type="submit" disabled={saving}>
               {saving ? "Saving..." : "Add image"}
