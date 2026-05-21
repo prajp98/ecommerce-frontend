@@ -14,6 +14,14 @@ export type Product = {
   categoryId: number;
   categoryName: string;
   active: boolean;
+  primaryImageUrl?: string | null;
+};
+
+export type ProductImage = {
+  id: number;
+  imageUrl: string;
+  primaryImage: boolean;
+  productId: number;
 };
 
 export type ProductPageResponse = {
@@ -36,13 +44,6 @@ export type CategoryListResponse = {
   status: number;
   message: string;
   data: Category[];
-};
-
-export type ProductImage = {
-  id: number;
-  imageUrl: string;
-  primaryImage: boolean;
-  productId: number;
 };
 
 export type ProductImageListResponse = {
