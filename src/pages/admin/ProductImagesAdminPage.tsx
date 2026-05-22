@@ -146,12 +146,7 @@ export default function ProductImagesAdminPage() {
 
       await api.post<ProductImageResponseWrapper>(
         `/products/${selectedProductId}/images/upload`,
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        form
       );
 
       setFormData({
