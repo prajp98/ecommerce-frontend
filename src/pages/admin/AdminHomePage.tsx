@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../lib/api";
+import Card from "../../components/ui/Card";
+import Alert from "../../components/ui/Alert";
+import Button from "../../components/ui/Button";
+import EmptyState from "../../components/ui/EmptyState";
+import PageHeader from "../../components/ui/PageHeader";
 
 type Category = {
   id: number;
@@ -97,9 +102,7 @@ export default function AdminHomePage() {
     <div>
       <div className="mb-6">
         <h2 className="text-2xl font-bold tracking-tight text-black">Dashboard</h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Quick overview of your store.
-        </p>
+        <p className="mt-2 text-sm text-gray-500">Quick overview of your store.</p>
       </div>
 
       {error && (
@@ -135,7 +138,7 @@ export default function AdminHomePage() {
             />
           </div>
 
-          <div className="mt-8 rounded-3xl border border-gray-200 bg-white p-6">
+          <Card>
             <h3 className="text-lg font-semibold text-black">Quick actions</h3>
 
             <div className="mt-5 flex flex-wrap gap-3">
@@ -164,7 +167,7 @@ export default function AdminHomePage() {
                 Manage orders
               </Link>
             </div>
-          </div>
+          </Card>
         </>
       )}
     </div>
