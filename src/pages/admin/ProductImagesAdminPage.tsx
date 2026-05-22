@@ -57,7 +57,7 @@ export default function ProductImagesAdminPage() {
     primaryImage: false,
   });
 
-  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [previewUrl, setPreviewUrl] = useState("");
 
   const fetchProducts = async () => {
     try {
@@ -116,6 +116,7 @@ export default function ProductImagesAdminPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+
     setFormData((prev) => ({
       ...prev,
       file,
@@ -157,10 +158,11 @@ export default function ProductImagesAdminPage() {
         file: null,
         primaryImage: false,
       });
+      setPreviewUrl("");
 
       await fetchImages(Number(selectedProductId));
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to add image");
+      setError(err?.response?.data?.message || "Failed to upload image");
     } finally {
       setSaving(false);
     }
@@ -218,7 +220,7 @@ export default function ProductImagesAdminPage() {
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <Card>
-          <h3 className="text-lg font-semibold text-black">Add image</h3>
+          <h3 className="text-lg font-semibold text-black">Upload image</h3>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <div>
@@ -279,7 +281,7 @@ export default function ProductImagesAdminPage() {
             )}
 
             <Button type="submit" disabled={saving}>
-              {saving ? "Saving..." : "Upload image"}
+              {saving ? "Uploading..." : "Upload image"}
             </Button>
           </form>
         </Card>
@@ -307,7 +309,7 @@ export default function ProductImagesAdminPage() {
           ) : images.length === 0 ? (
             <EmptyState
               title="No images found"
-              description="Add the first image for this product."
+              description="Upload the first image for this product."
             />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -341,9 +343,7 @@ export default function ProductImagesAdminPage() {
                           onClick={() => handleSetPrimary(image.id)}
                           disabled={settingPrimaryId === image.id}
                         >
-                          {settingPrimaryId === image.id
-                            ? "Setting..."
-                            : "Set primary"}
+                          {settingPrimaryId === image.id ? "Setting..." : "Set primary"}
                         </Button>
                       )}
 
