@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resolveImageUrl } from "../../lib/imageUrl";
 
 type ProductImageProps = {
   src?: string | null;
@@ -14,8 +15,9 @@ export default function ProductImage({
   fallbackText = "No image available",
 }: ProductImageProps) {
   const [imageError, setImageError] = useState(false);
+  const resolvedSrc = resolveImageUrl(src);
 
-  if (!src || imageError) {
+  if (!resolvedSrc || imageError) {
     return (
       <div
         className={`flex h-full w-full items-center justify-center bg-gray-100 text-sm text-gray-400 ${className}`}
@@ -27,7 +29,7 @@ export default function ProductImage({
 
   return (
     <img
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       className={`h-full w-full object-cover ${className}`}
       onError={() => setImageError(true)}
