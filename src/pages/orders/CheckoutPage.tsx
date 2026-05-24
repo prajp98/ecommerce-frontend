@@ -43,6 +43,19 @@ type AddressResponseWrapper = {
   data: Address[];
 };
 
+type OrderResponse = {
+  orderId: number;
+  orderNumber: string;
+  totalAmount: number;
+};
+
+type OrderResponseWrapper = {
+  timestamp: string;
+  status: number;
+  message: string;
+  data: OrderResponse;
+};
+
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -78,7 +91,9 @@ export default function CheckoutPage() {
       setCartItems(cartData);
       setAddresses(addressData);
 
-      const defaultAddress = addressData.find((address) => address.defaultAddress);
+      const defaultAddress = addressData.find(
+        (address) => address.defaultAddress
+      );
       if (defaultAddress) {
         setSelectedAddressId(defaultAddress.id);
       } else if (addressData.length > 0) {
@@ -117,16 +132,17 @@ export default function CheckoutPage() {
     try {
       setPlacingOrder(true);
 
-      await api.post("/orders", {
+      const response = await api.post<OrderResponseWrapper>("/orders", {
         addressId: selectedAddressId,
         paymentMethod,
       });
 
+      const createdOrder = response.data.data;
       setSuccess("Order placed successfully");
 
       setTimeout(() => {
-        navigate("/orders");
-      }, 1200);
+        navigate(`/order-success/${createdOrder.orderId}`);
+      }, 800);
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to place order");
     } finally {
@@ -184,7 +200,9 @@ export default function CheckoutPage() {
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-6">
             <Card>
-              <h2 className="text-lg font-semibold text-black">Shipping address</h2>
+              <h2 className="text-lg font-semibold text-black">
+                Shipping address
+              </h2>
 
               {addresses.length === 0 ? (
                 <div className="mt-4">
@@ -217,7 +235,9 @@ export default function CheckoutPage() {
                       />
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-black">{address.line1}</p>
+                          <p className="font-medium text-black">
+                            {address.line1}
+                          </p>
                           {address.defaultAddress && (
                             <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
                               Default
@@ -237,7 +257,9 @@ export default function CheckoutPage() {
             </Card>
 
             <Card>
-              <h2 className="text-lg font-semibold text-black">Payment method</h2>
+              <h2 className="text-lg font-semibold text-black">
+                Payment method
+              </h2>
 
               <div className="mt-4 space-y-3">
                 <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-gray-200 p-4">
