@@ -157,8 +157,8 @@ export default function CartPage() {
                       onClick={() =>
                         handleQuantityChange(item.cartItemId, item.quantity - 1)
                       }
-                      className="h-10 w-10 rounded-full border border-gray-300 text-lg font-semibold"
                       disabled={updatingItemId === item.cartItemId}
+                      className="cursor-pointer h-10 w-10 rounded-full border border-gray-300 text-lg font-semibold disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       −
                     </button>
@@ -171,8 +171,8 @@ export default function CartPage() {
                       onClick={() =>
                         handleQuantityChange(item.cartItemId, item.quantity + 1)
                       }
-                      className="h-10 w-10 rounded-full border border-gray-300 text-lg font-semibold"
                       disabled={updatingItemId === item.cartItemId}
+                      className="cursor-pointer h-10 w-10 rounded-full border border-gray-300 text-lg font-semibold disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       +
                     </button>
@@ -187,7 +187,7 @@ export default function CartPage() {
                   <button
                     onClick={() => handleRemove(item.cartItemId)}
                     disabled={removingItemId === item.cartItemId}
-                    className="text-sm font-medium text-red-600 transition hover:text-red-700 disabled:opacity-60"
+                    className="cursor-pointer text-sm font-medium text-red-600 transition hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {removingItemId === item.cartItemId
                       ? "Removing..."
