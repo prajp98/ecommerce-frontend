@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type ReactNode } from "react";
+import {type ButtonHTMLAttributes, type  ReactNode } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
@@ -12,7 +12,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "rounded-2xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
+    "cursor-pointer rounded-2xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60";
 
   const styles = {
     primary: "bg-black text-white hover:bg-gray-800",
