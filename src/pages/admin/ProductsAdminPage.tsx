@@ -6,6 +6,7 @@ import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
+import ProductImage from "../../components/product/ProductImage";
 
 type Category = {
   id: number;
@@ -316,17 +317,11 @@ export default function ProductsAdminPage() {
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex gap-4">
                       <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-100">
-                        {product.primaryImageUrl ? (
-                          <img
-                            src={product.primaryImageUrl}
-                            alt={product.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-xs text-gray-400">
-                            No image
-                          </div>
-                        )}
+                        <ProductImage
+                          src={product.primaryImageUrl}
+                          alt={product.name}
+                          fallbackText="No image"
+                        />
                       </div>
 
                       <div>
