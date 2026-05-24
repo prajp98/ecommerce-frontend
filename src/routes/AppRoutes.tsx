@@ -16,6 +16,7 @@ import CategoriesAdminPage from "../pages/admin/CategoriesAdminPage";
 import ProductsAdminPage from "../pages/admin/ProductsAdminPage";
 import ProductImagesAdminPage from "../pages/admin/ProductImagesAdminPage";
 import OrdersAdminPage from "../pages/admin/OrdersAdminPage";
+import OrderSuccessPage from "../pages/orders/OrderSuccessPage";
 
 export default function AppRoutes() {
   return (
@@ -35,6 +36,7 @@ export default function AppRoutes() {
           <Route path="/addresses" element={<AddressesPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
         </Route>
       </Route>
 
