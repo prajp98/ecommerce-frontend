@@ -337,6 +337,7 @@ export default function ProductImagesAdminPage() {
                           variant="secondary"
                           onClick={() => handleSetPrimary(image.id)}
                           disabled={settingPrimaryId === image.id}
+                          className="cursor-pointer"
                         >
                           {settingPrimaryId === image.id ? "Setting..." : "Set primary"}
                         </Button>
@@ -346,6 +347,7 @@ export default function ProductImagesAdminPage() {
                         variant="danger"
                         onClick={() => handleDelete(image.id)}
                         disabled={deletingId === image.id}
+                        className="cursor-pointer"
                       >
                         {deletingId === image.id ? "Deleting..." : "Delete"}
                       </Button>
