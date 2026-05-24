@@ -21,6 +21,22 @@ type ProductResponseWrapper = {
   data: Product;
 };
 
+type CartItem = {
+  cartItemId: number;
+  productId: number;
+  productName: string;
+  price: number;
+  quantity: number;
+  totalPrice: number;
+};
+
+type CartResponseWrapper = {
+  timestamp: string;
+  status: number;
+  message: string;
+  data: CartItem[];
+};
+
 export default function ProductDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,12 +47,41 @@ export default function ProductDetailPage() {
   const [images, setImages] = useState<ProductImageType[]>([]);
   const [primaryImageUrl, setPrimaryImageUrl] = useState<string>("");
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
+  const [cartItemId, setCartItemId] = useState<number | null>(null);
+  const [cartQuantity, setCartQuantity] = useState<number>(0);
+
   const [loading, setLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [updatingCart, setUpdatingCart] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const productId = useMemo(() => Number(id), [id]);
+
+  const fetchCartItemForProduct = async () => {
+    if (!isAuthenticated || Number.isNaN(productId)) {
+      setCartItemId(null);
+      setCartQuantity(0);
+      return;
+    }
+
+    try {
+      setCartLoading(true);
+
+      const response = await api.get<CartResponseWrapper>("/cart/me");
+      const items = response.data.data || [];
+      const matchingItem = items.find((item) => item.productId === productId);
+
+      setCartItemId(matchingItem ? matchingItem.cartItemId : null);
+      setCartQuantity(matchingItem ? matchingItem.quantity : 0);
+    } catch {
+      setCartItemId(null);
+      setCartQuantity(0);
+    } finally {
+      setCartLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -75,7 +120,12 @@ export default function ProductDetailPage() {
     }
   }, [productId]);
 
-  const handleAddToCart = async () => {
+  useEffect(() => {
+    fetchCartItemForProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, productId]);
+
+  const handleIncrease = async () => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
@@ -83,8 +133,8 @@ export default function ProductDetailPage() {
 
     try {
       setAddingToCart(true);
-      setSuccess("");
       setError("");
+      setSuccess("");
 
       await api.post("/cart/items", {
         productId,
@@ -92,11 +142,43 @@ export default function ProductDetailPage() {
       });
 
       await refreshCartCount();
-      setSuccess("Added to cart successfully");
+      await fetchCartItemForProduct();
+      setSuccess("Cart updated successfully");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to add to cart");
+      setError(err?.response?.data?.message || "Failed to update cart");
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const handleDecrease = async () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (!cartItemId) return;
+
+    try {
+      setUpdatingCart(true);
+      setError("");
+      setSuccess("");
+
+      if (cartQuantity <= 1) {
+        await api.delete(`/cart/items/${cartItemId}`);
+      } else {
+        await api.put(`/cart/items/${cartItemId}`, {
+          quantity: cartQuantity - 1,
+        });
+      }
+
+      await refreshCartCount();
+      await fetchCartItemForProduct();
+      setSuccess("Cart updated successfully");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to update cart");
+    } finally {
+      setUpdatingCart(false);
     }
   };
 
@@ -129,6 +211,8 @@ export default function ProductDetailPage() {
     );
   }
 
+  const currentQuantity = cartQuantity;
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-10">
       <PageHeader
@@ -159,7 +243,7 @@ export default function ProductDetailPage() {
                 <button
                   key={image.id}
                   onClick={() => setSelectedImageUrl(image.imageUrl)}
-                  className={`h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl border transition ${
+                  className={`cursor-pointer h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl border transition ${
                     selectedImageUrl === image.imageUrl
                       ? "border-black"
                       : "border-gray-200"
@@ -216,13 +300,26 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button
-                onClick={handleAddToCart}
-                disabled={addingToCart || product.stock <= 0}
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <button
+                onClick={handleDecrease}
+                disabled={cartLoading || updatingCart || currentQuantity === 0}
+                className="cursor-pointer h-11 w-11 rounded-2xl border border-gray-300 text-lg font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {addingToCart ? "Adding..." : "Add to cart"}
-              </Button>
+                −
+              </button>
+
+              <div className="flex h-11 min-w-14 items-center justify-center rounded-2xl border border-gray-300 px-4 text-sm font-semibold text-black">
+                {cartLoading ? "..." : currentQuantity}
+              </div>
+
+              <button
+                onClick={handleIncrease}
+                disabled={addingToCart || updatingCart || product.stock <= 0}
+                className="cursor-pointer h-11 w-11 rounded-2xl bg-black text-lg font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                +
+              </button>
 
               <Link to="/cart">
                 <Button variant="secondary">Go to cart</Button>
