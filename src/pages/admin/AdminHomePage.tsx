@@ -6,6 +6,7 @@ import Alert from "../../components/ui/Alert";
 import Button from "../../components/ui/Button";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../components/ui/Toast";
 
 type Category = {
   id: number;
@@ -52,6 +53,7 @@ type ListResponseWrapper<T> = {
 };
 
 export default function AdminHomePage() {
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -89,20 +91,27 @@ export default function AdminHomePage() {
           pendingOrders: orders.filter((o) => o.status === "PENDING").length,
         });
       } catch (err: any) {
-        setError(err?.response?.data?.message || "Failed to load dashboard stats");
+        const message =
+          err?.response?.data?.message || "Failed to load dashboard stats";
+        setError(message);
+        showToast(message, "error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
-  }, []);
+  }, [showToast]);
 
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-black">Dashboard</h2>
-        <p className="mt-2 text-sm text-gray-500">Quick overview of your store.</p>
+        <h2 className="text-2xl font-bold tracking-tight text-black">
+          Dashboard
+        </h2>
+        <p className="mt-2 text-sm text-gray-500">
+          Quick overview of your store.
+        </p>
       </div>
 
       {error && (
