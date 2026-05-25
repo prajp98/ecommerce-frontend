@@ -8,6 +8,7 @@ import Button from "../../components/ui/Button";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
 import ProductImage from "../../components/product/ProductImage";
+import { useToast } from "../../components/ui/Toast";
 import type {
   Product,
   ProductImage as ProductImageType,
@@ -42,6 +43,7 @@ export default function ProductDetailPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { refreshCartCount } = useCart();
+  const { showToast } = useToast();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<ProductImageType[]>([]);
@@ -55,7 +57,6 @@ export default function ProductDetailPage() {
   const [addingToCart, setAddingToCart] = useState(false);
   const [updatingCart, setUpdatingCart] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const productId = useMemo(() => Number(id), [id]);
 
@@ -134,7 +135,6 @@ export default function ProductDetailPage() {
     try {
       setAddingToCart(true);
       setError("");
-      setSuccess("");
 
       await api.post("/cart/items", {
         productId,
@@ -143,9 +143,9 @@ export default function ProductDetailPage() {
 
       await refreshCartCount();
       await fetchCartItemForProduct();
-      setSuccess("Cart updated successfully");
+      showToast("Cart updated successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to update cart");
+      showToast(err?.response?.data?.message || "Failed to update cart", "error");
     } finally {
       setAddingToCart(false);
     }
@@ -162,7 +162,6 @@ export default function ProductDetailPage() {
     try {
       setUpdatingCart(true);
       setError("");
-      setSuccess("");
 
       if (cartQuantity <= 1) {
         await api.delete(`/cart/items/${cartItemId}`);
@@ -174,9 +173,9 @@ export default function ProductDetailPage() {
 
       await refreshCartCount();
       await fetchCartItemForProduct();
-      setSuccess("Cart updated successfully");
+      showToast("Cart updated successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to update cart");
+      showToast(err?.response?.data?.message || "Failed to update cart", "error");
     } finally {
       setUpdatingCart(false);
     }
@@ -287,12 +286,6 @@ export default function ProductDetailPage() {
             <p className="mt-6 text-base leading-7 text-gray-600">
               {product.description}
             </p>
-
-            {success && (
-              <div className="mt-6">
-                <Alert variant="success">{success}</Alert>
-              </div>
-            )}
 
             {error && (
               <div className="mt-6">
