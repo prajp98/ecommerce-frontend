@@ -7,6 +7,7 @@ import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../components/ui/Toast";
 
 type CartItem = {
   cartItemId: number;
@@ -59,6 +60,7 @@ type OrderResponseWrapper = {
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -68,7 +70,6 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const subtotal = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.totalPrice, 0),
@@ -100,7 +101,9 @@ export default function CheckoutPage() {
         setSelectedAddressId(addressData[0].id);
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to load checkout data");
+      const message = err?.response?.data?.message || "Failed to load checkout data";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
@@ -117,15 +120,18 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     setError("");
-    setSuccess("");
 
     if (!selectedAddressId) {
-      setError("Please select an address");
+      const message = "Please select an address";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
     if (cartItems.length === 0) {
-      setError("Your cart is empty");
+      const message = "Your cart is empty";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -138,13 +144,16 @@ export default function CheckoutPage() {
       });
 
       const createdOrder = response.data.data;
-      setSuccess("Order placed successfully");
+
+      showToast("Order placed successfully", "success");
 
       setTimeout(() => {
         navigate(`/order-success/${createdOrder.orderId}`);
       }, 800);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to place order");
+      const message = err?.response?.data?.message || "Failed to place order";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setPlacingOrder(false);
     }
@@ -177,12 +186,6 @@ export default function CheckoutPage() {
       {error && (
         <div className="mb-6">
           <Alert variant="error">{error}</Alert>
-        </div>
-      )}
-
-      {success && (
-        <div className="mb-6">
-          <Alert variant="success">{success}</Alert>
         </div>
       )}
 
