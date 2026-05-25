@@ -5,9 +5,11 @@ import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
+import { useToast } from "../../components/ui/Toast";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -36,12 +38,16 @@ export default function RegisterPage() {
       !formData.email.trim() ||
       !formData.password.trim()
     ) {
-      setError("Name, email and password are required");
+      const message = "Name, email and password are required";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
     if (formData.password.trim().length < 8) {
-      setError("Password must be at least 8 characters");
+      const message = "Password must be at least 8 characters";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -54,12 +60,14 @@ export default function RegisterPage() {
         password: formData.password,
       });
 
+      showToast("Account created successfully", "success");
       navigate("/login");
     } catch (err: any) {
       const message =
         err?.response?.data?.message ||
         "Registration failed. Please try again.";
       setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
