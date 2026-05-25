@@ -1,4 +1,4 @@
-import { NavLink, Outlet, Link } from "react-router";
+import { Link, NavLink, Outlet } from "react-router";
 
 export default function AdminDashboardPage() {
   const linkClass = ({ isActive }: { isActive: boolean }) =>
