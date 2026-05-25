@@ -6,10 +6,12 @@ import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
+import { useToast } from "../../components/ui/Toast";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -33,7 +35,9 @@ export default function LoginPage() {
     setError("");
 
     if (!formData.email.trim() || !formData.password.trim()) {
-      setError("Email and password are required");
+      const message = "Email and password are required";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -46,12 +50,14 @@ export default function LoginPage() {
       });
 
       login(response.data.data);
+      showToast("Login successful", "success");
       navigate("/products");
     } catch (err: any) {
       const message =
         err?.response?.data?.message ||
         "Login failed. Please check your credentials.";
       setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
@@ -100,7 +106,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-sm text-gray-600">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link to="/register" className="font-medium text-black underline">
             Register
           </Link>
