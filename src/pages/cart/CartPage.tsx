@@ -8,6 +8,7 @@ import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../components/ui/Toast";
 
 type CartItem = {
   cartItemId: number;
@@ -29,6 +30,7 @@ export default function CartPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { refreshCartCount } = useCart();
+  const { showToast } = useToast();
 
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -75,8 +77,11 @@ export default function CartPage() {
       await api.put(`/cart/items/${cartItemId}`, { quantity });
       await fetchCart();
       await refreshCartCount();
+      showToast("Cart updated successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to update item");
+      const message = err?.response?.data?.message || "Failed to update item";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setUpdatingItemId(null);
     }
@@ -90,8 +95,11 @@ export default function CartPage() {
       await api.delete(`/cart/items/${cartItemId}`);
       await fetchCart();
       await refreshCartCount();
+      showToast("Item removed from cart", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to remove item");
+      const message = err?.response?.data?.message || "Failed to remove item";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setRemovingItemId(null);
     }
