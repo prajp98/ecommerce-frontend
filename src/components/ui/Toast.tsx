@@ -25,7 +25,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
     window.setTimeout(() => {
       setToasts((prev) => prev.filter((item) => item.id !== id));
-    }, 3000);
+    }, 2800);
+  };
+
+  const dismissToast = (id: number) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
   const value = useMemo(() => ({ showToast }), []);
@@ -34,19 +38,29 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
 
-      <div className="fixed right-4 top-4 z-50 space-y-3">
+      <div className="pointer-events-none fixed right-4 top-4 z-50 flex w-full max-w-sm flex-col gap-3">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`max-w-sm rounded-2xl border px-4 py-3 text-sm shadow-lg ${
+            className={`pointer-events-auto rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-sm transition ${
               toast.type === "success"
-                ? "border-green-200 bg-green-50 text-green-700"
+                ? "border-green-200 bg-green-50 text-green-800"
                 : toast.type === "error"
-                ? "border-red-200 bg-red-50 text-red-600"
+                ? "border-red-200 bg-red-50 text-red-700"
                 : "border-gray-200 bg-white text-gray-700"
             }`}
           >
-            {toast.message}
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-sm font-medium leading-5">{toast.message}</p>
+              <button
+                type="button"
+                onClick={() => dismissToast(toast.id)}
+                className="cursor-pointer -mt-0.5 text-base leading-none text-gray-400 transition hover:text-gray-700"
+                aria-label="Dismiss toast"
+              >
+                ×
+              </button>
+            </div>
           </div>
         ))}
       </div>
