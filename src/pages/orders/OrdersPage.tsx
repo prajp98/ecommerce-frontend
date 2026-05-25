@@ -7,6 +7,7 @@ import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../components/ui/Toast";
 
 type OrderItem = {
   orderItemId: number;
@@ -46,6 +47,7 @@ type OrdersResponseWrapper = {
 export default function OrdersPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
@@ -60,7 +62,9 @@ export default function OrdersPage() {
       const response = await api.get<OrdersResponseWrapper>("/orders/me");
       setOrders(response.data.data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to load orders");
+      const message = err?.response?.data?.message || "Failed to load orders";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
@@ -168,7 +172,7 @@ export default function OrdersPage() {
                     expandedOrderId === order.orderId ? null : order.orderId
                   )
                 }
-                className="mt-5 text-sm font-medium text-black underline"
+                className="cursor-pointer mt-5 text-sm font-medium text-black underline"
               >
                 {expandedOrderId === order.orderId ? "Hide items" : "View items"}
               </button>
