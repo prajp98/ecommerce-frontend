@@ -6,7 +6,7 @@ import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
-import ProductImage from "../../components/product/ProductImage";
+import { useToast } from "../../components/ui/Toast";
 
 type Category = {
   id: number;
@@ -47,6 +47,8 @@ type CategoryListResponseWrapper = {
 };
 
 export default function ProductsAdminPage() {
+  const { showToast } = useToast();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -75,7 +77,9 @@ export default function ProductsAdminPage() {
       setProducts(productsResponse.data.data);
       setCategories(categoriesResponse.data.data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to load products");
+      const message = err?.response?.data?.message || "Failed to load products";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
@@ -119,7 +123,9 @@ export default function ProductsAdminPage() {
       !formData.stock.trim() ||
       !formData.categoryId.trim()
     ) {
-      setError("Please fill all required fields");
+      const message = "Please fill all required fields";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -136,14 +142,18 @@ export default function ProductsAdminPage() {
 
       if (editingId) {
         await api.put<ProductResponseWrapper>(`/products/${editingId}`, payload);
+        showToast("Product updated successfully", "success");
       } else {
         await api.post<ProductResponseWrapper>("/products", payload);
+        showToast("Product created successfully", "success");
       }
 
       resetForm();
       await fetchData();
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to save product");
+      const message = err?.response?.data?.message || "Failed to save product";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }
@@ -167,13 +177,18 @@ export default function ProductsAdminPage() {
 
       if (product.active) {
         await api.patch(`/products/${product.id}/deactivate`);
+        showToast("Product deactivated successfully", "success");
       } else {
         await api.patch(`/products/${product.id}/activate`);
+        showToast("Product activated successfully", "success");
       }
 
       await fetchData();
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to update product status");
+      const message =
+        err?.response?.data?.message || "Failed to update product status";
+      setError(message);
+      showToast(message, "error");
     }
   };
 
@@ -317,11 +332,17 @@ export default function ProductsAdminPage() {
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex gap-4">
                       <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-100">
-                        <ProductImage
-                          src={product.primaryImageUrl}
-                          alt={product.name}
-                          fallbackText="No image"
-                        />
+                        {product.primaryImageUrl ? (
+                          <img
+                            src={product.primaryImageUrl}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-gray-400">
+                            No image
+                          </div>
+                        )}
                       </div>
 
                       <div>
@@ -354,7 +375,10 @@ export default function ProductsAdminPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="secondary" onClick={() => handleEdit(product)}>
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleEdit(product)}
+                      >
                         Edit
                       </Button>
 
