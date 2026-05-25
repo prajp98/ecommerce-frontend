@@ -5,6 +5,7 @@ import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
 import EmptyState from "../../components/ui/EmptyState";
+import { useToast } from "../../components/ui/Toast";
 
 type OrderItem = {
   orderItemId: number;
@@ -57,6 +58,8 @@ const ORDER_STATUSES = [
 ];
 
 export default function OrdersAdminPage() {
+  const { showToast } = useToast();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -80,7 +83,9 @@ export default function OrdersAdminPage() {
       });
       setStatusMap(nextStatusMap);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to load orders");
+      const message = err?.response?.data?.message || "Failed to load orders";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
@@ -109,8 +114,12 @@ export default function OrdersAdminPage() {
       });
 
       await fetchOrders();
+      showToast("Order status updated successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to update order status");
+      const message =
+        err?.response?.data?.message || "Failed to update order status";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setUpdatingOrderId(null);
     }
