@@ -6,6 +6,7 @@ import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
 import EmptyState from "../../components/ui/EmptyState";
 import ProductImage from "../../components/product/ProductImage";
+import { useToast } from "../../components/ui/Toast";
 
 type Product = {
   id: number;
@@ -42,6 +43,8 @@ type ProductImageResponseWrapper = {
 };
 
 export default function ProductImagesAdminPage() {
+  const { showToast } = useToast();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [images, setImages] = useState<ProductImageType[]>([]);
@@ -67,7 +70,9 @@ export default function ProductImagesAdminPage() {
       const response = await api.get<ProductListResponseWrapper>("/products");
       setProducts(response.data.data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to load products");
+      const message = err?.response?.data?.message || "Failed to load products";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoadingProducts(false);
     }
@@ -83,8 +88,10 @@ export default function ProductImagesAdminPage() {
       );
       setImages(response.data.data);
     } catch (err: any) {
+      const message = err?.response?.data?.message || "Failed to load images";
       setImages([]);
-      setError(err?.response?.data?.message || "Failed to load images");
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoadingImages(false);
     }
@@ -128,12 +135,16 @@ export default function ProductImagesAdminPage() {
     setError("");
 
     if (!selectedProductId) {
-      setError("Please select a product");
+      const message = "Please select a product";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
     if (!formData.file) {
-      setError("Please choose an image file");
+      const message = "Please choose an image file";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -156,8 +167,11 @@ export default function ProductImagesAdminPage() {
       setPreviewUrl("");
 
       await fetchImages(Number(selectedProductId));
+      showToast("Image uploaded successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to upload image");
+      const message = err?.response?.data?.message || "Failed to upload image";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }
@@ -172,8 +186,12 @@ export default function ProductImagesAdminPage() {
       if (selectedProductId) {
         await fetchImages(Number(selectedProductId));
       }
+
+      showToast("Image deleted successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to delete image");
+      const message = err?.response?.data?.message || "Failed to delete image";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setDeletingId(null);
     }
@@ -188,8 +206,12 @@ export default function ProductImagesAdminPage() {
       if (selectedProductId) {
         await fetchImages(Number(selectedProductId));
       }
+
+      showToast("Primary image updated successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to set primary image");
+      const message = err?.response?.data?.message || "Failed to set primary image";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setSettingPrimaryId(null);
     }
@@ -339,7 +361,9 @@ export default function ProductImagesAdminPage() {
                           disabled={settingPrimaryId === image.id}
                           className="cursor-pointer"
                         >
-                          {settingPrimaryId === image.id ? "Setting..." : "Set primary"}
+                          {settingPrimaryId === image.id
+                            ? "Setting..."
+                            : "Set primary"}
                         </Button>
                       )}
 
