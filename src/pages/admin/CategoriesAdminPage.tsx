@@ -5,6 +5,7 @@ import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
+import { useToast } from "../../components/ui/Toast";
 
 type Category = {
   id: number;
@@ -28,6 +29,8 @@ type CategoryListResponseWrapper = {
 };
 
 export default function CategoriesAdminPage() {
+  const { showToast } = useToast();
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -47,7 +50,10 @@ export default function CategoriesAdminPage() {
       const response = await api.get<CategoryListResponseWrapper>("/categories");
       setCategories(response.data.data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to load categories");
+      const message =
+        err?.response?.data?.message || "Failed to load categories";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
@@ -81,7 +87,9 @@ export default function CategoriesAdminPage() {
     setError("");
 
     if (!formData.name.trim()) {
-      setError("Category name is required");
+      const message = "Category name is required";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -89,15 +97,22 @@ export default function CategoriesAdminPage() {
       setSaving(true);
 
       if (editingId) {
-        await api.put<CategoryResponseWrapper>(`/categories/${editingId}`, formData);
+        await api.put<CategoryResponseWrapper>(
+          `/categories/${editingId}`,
+          formData
+        );
+        showToast("Category updated successfully", "success");
       } else {
         await api.post<CategoryResponseWrapper>("/categories", formData);
+        showToast("Category created successfully", "success");
       }
 
       resetForm();
       await fetchCategories();
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to save category");
+      const message = err?.response?.data?.message || "Failed to save category";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }
@@ -118,13 +133,19 @@ export default function CategoriesAdminPage() {
 
       if (category.active) {
         await api.patch(`/categories/${category.id}/deactivate`);
+        showToast("Category deactivated successfully", "success");
       } else {
         await api.patch(`/categories/${category.id}/activate`);
+        showToast("Category activated successfully", "success");
       }
 
       await fetchCategories();
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to update category status");
+      const message =
+        err?.response?.data?.message ||
+        "Failed to update category status";
+      setError(message);
+      showToast(message, "error");
     }
   };
 
@@ -233,7 +254,10 @@ export default function CategoriesAdminPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      <Button variant="secondary" onClick={() => handleEdit(category)}>
+                      <Button
+                        variant="secondary"
+                        onClick={() => handleEdit(category)}
+                      >
                         Edit
                       </Button>
 
