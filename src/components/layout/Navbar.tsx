@@ -47,9 +47,6 @@ export default function Navbar() {
           <NavLink to="/orders" className={linkClass}>
             Orders
           </NavLink>
-          <NavLink to="/addresses" className={linkClass}>
-            Addresses
-          </NavLink>
           {user?.role === "ADMIN" && (
             <NavLink to="/admin" className={linkClass}>
               Admin
@@ -124,9 +121,6 @@ export default function Navbar() {
             </NavLink>
             <NavLink to="/orders" onClick={closeMobileMenu} className={linkClass}>
               Orders
-            </NavLink>
-            <NavLink to="/addresses" onClick={closeMobileMenu} className={linkClass}>
-              Addresses
             </NavLink>
             {user?.role === "ADMIN" && (
               <NavLink to="/admin" onClick={closeMobileMenu} className={linkClass}>
