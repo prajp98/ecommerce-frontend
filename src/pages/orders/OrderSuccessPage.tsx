@@ -67,7 +67,8 @@ export default function OrderSuccessPage() {
         const response = await api.get<OrderResponseWrapper>(`/orders/${orderId}`);
         setOrder(response.data.data);
       } catch (err: any) {
-        const message = err?.response?.data?.message || "Failed to load order details";
+        const message =
+          err?.response?.data?.message || "Failed to load order details";
         setError(message);
       } finally {
         setLoading(false);
