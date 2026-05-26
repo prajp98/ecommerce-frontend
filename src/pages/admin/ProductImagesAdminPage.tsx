@@ -209,7 +209,8 @@ export default function ProductImagesAdminPage() {
 
       showToast("Primary image updated successfully", "success");
     } catch (err: any) {
-      const message = err?.response?.data?.message || "Failed to set primary image";
+      const message =
+        err?.response?.data?.message || "Failed to set primary image";
       setError(message);
       showToast(message, "error");
     } finally {
@@ -361,9 +362,7 @@ export default function ProductImagesAdminPage() {
                           disabled={settingPrimaryId === image.id}
                           className="cursor-pointer"
                         >
-                          {settingPrimaryId === image.id
-                            ? "Setting..."
-                            : "Set primary"}
+                          {settingPrimaryId === image.id ? "Setting..." : "Set primary"}
                         </Button>
                       )}
 
