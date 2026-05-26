@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../components/ui/Toast";
 
 type Address = {
   id: number;
@@ -25,6 +26,7 @@ type AddressResponseWrapper = {
 export default function AddressesPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,9 @@ export default function AddressesPage() {
       const response = await api.get<AddressResponseWrapper>("/addresses/me");
       setAddresses(response.data.data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to load addresses");
+      const message = err?.response?.data?.message || "Failed to load addresses";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setLoading(false);
     }
@@ -106,7 +110,9 @@ export default function AddressesPage() {
       !formData.zipCode.trim() ||
       !formData.country.trim()
     ) {
-      setError("Please fill all required fields");
+      const message = "Please fill all required fields";
+      setError(message);
+      showToast(message, "error");
       return;
     }
 
@@ -115,14 +121,18 @@ export default function AddressesPage() {
 
       if (editingId) {
         await api.put(`/addresses/${editingId}`, formData);
+        showToast("Address updated successfully", "success");
       } else {
         await api.post("/addresses", formData);
+        showToast("Address added successfully", "success");
       }
 
       resetForm();
       await fetchAddresses();
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to save address");
+      const message = err?.response?.data?.message || "Failed to save address";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setSubmitting(false);
     }
@@ -149,8 +159,11 @@ export default function AddressesPage() {
 
       await api.delete(`/addresses/${addressId}`);
       await fetchAddresses();
+      showToast("Address deleted successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to delete address");
+      const message = err?.response?.data?.message || "Failed to delete address";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setDeletingId(null);
     }
@@ -163,8 +176,12 @@ export default function AddressesPage() {
 
       await api.patch(`/addresses/${addressId}/default`);
       await fetchAddresses();
+      showToast("Default address updated successfully", "success");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to set default address");
+      const message =
+        err?.response?.data?.message || "Failed to set default address";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setDefaultingId(null);
     }
@@ -173,7 +190,9 @@ export default function AddressesPage() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-10">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Addresses</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-black">
+          Addresses
+        </h1>
         <p className="mt-2 text-sm text-gray-500">
           Add shipping addresses and choose a default address for checkout.
         </p>
@@ -254,7 +273,7 @@ export default function AddressesPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting
                   ? "Saving..."
@@ -267,7 +286,7 @@ export default function AddressesPage() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="rounded-2xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
+                  className="cursor-pointer rounded-2xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
                 >
                   Cancel
                 </button>
@@ -303,14 +322,15 @@ export default function AddressesPage() {
                     </div>
                     <p className="mt-2 text-sm text-gray-600">
                       {address.line2 && `${address.line2}, `}
-                      {address.city}, {address.state} - {address.zipCode}, {address.country}
+                      {address.city}, {address.state} - {address.zipCode},{" "}
+                      {address.country}
                     </p>
                   </div>
 
                   <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() => handleEdit(address)}
-                      className="rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                      className="cursor-pointer rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                     >
                       Edit
                     </button>
@@ -319,16 +339,18 @@ export default function AddressesPage() {
                       <button
                         onClick={() => handleSetDefault(address.id)}
                         disabled={defaultingId === address.id}
-                        className="rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:opacity-60"
+                        className="cursor-pointer rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:opacity-60"
                       >
-                        {defaultingId === address.id ? "Setting..." : "Make default"}
+                        {defaultingId === address.id
+                          ? "Setting..."
+                          : "Make default"}
                       </button>
                     )}
 
                     <button
                       onClick={() => handleDelete(address.id)}
                       disabled={deletingId === address.id}
-                      className="rounded-2xl border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+                      className="cursor-pointer rounded-2xl border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60"
                     >
                       {deletingId === address.id ? "Deleting..." : "Delete"}
                     </button>
@@ -343,7 +365,7 @@ export default function AddressesPage() {
       <div className="mt-8">
         <Link
           to="/cart"
-          className="inline-flex rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+          className="inline-flex cursor-pointer rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
         >
           Back to cart
         </Link>
