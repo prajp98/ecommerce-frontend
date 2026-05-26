@@ -101,7 +101,8 @@ export default function CheckoutPage() {
         setSelectedAddressId(addressData[0].id);
       }
     } catch (err: any) {
-      const message = err?.response?.data?.message || "Failed to load checkout data";
+      const message =
+        err?.response?.data?.message || "Failed to load checkout data";
       setError(message);
       showToast(message, "error");
     } finally {
@@ -148,7 +149,13 @@ export default function CheckoutPage() {
       showToast("Order placed successfully", "success");
 
       setTimeout(() => {
-        navigate(`/order-success/${createdOrder.orderId}`);
+        navigate(`/order-success/${createdOrder.orderId}`, {
+          state: {
+            orderNumber: createdOrder.orderNumber,
+            totalAmount: createdOrder.totalAmount,
+            paymentMethod,
+          },
+        });
       }, 800);
     } catch (err: any) {
       const message = err?.response?.data?.message || "Failed to place order";
