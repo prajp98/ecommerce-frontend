@@ -8,6 +8,7 @@ import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
 import { useToast } from "../../components/ui/Toast";
+import OrderStatusBadge from "../../components/ui/OrderStatusBadge";
 
 type OrderItem = {
   orderItemId: number;
@@ -129,17 +130,7 @@ export default function OrdersPage() {
                     <h2 className="text-lg font-semibold text-black">
                       {order.orderNumber}
                     </h2>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
-                        order.status === "DELIVERED"
-                          ? "bg-green-100 text-green-700"
-                          : order.status === "CANCELLED"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {order.status}
-                    </span>
+                    <OrderStatusBadge status={order.status} />
                   </div>
 
                   <p className="mt-2 text-sm text-gray-500">
