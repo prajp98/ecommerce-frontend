@@ -10,13 +10,14 @@ import CartPage from "../pages/cart/CartPage";
 import AddressesPage from "../pages/addresses/AddressesPage";
 import CheckoutPage from "../pages/orders/CheckoutPage";
 import OrdersPage from "../pages/orders/OrdersPage";
+import OrderDetailsPage from "../pages/orders/OrderDetailsPage";
+import OrderSuccessPage from "../pages/orders/OrderSuccessPage";
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import CategoriesAdminPage from "../pages/admin/CategoriesAdminPage";
 import ProductsAdminPage from "../pages/admin/ProductsAdminPage";
 import ProductImagesAdminPage from "../pages/admin/ProductImagesAdminPage";
 import OrdersAdminPage from "../pages/admin/OrdersAdminPage";
-import OrderSuccessPage from "../pages/orders/OrderSuccessPage";
 
 export default function AppRoutes() {
   return (
@@ -36,6 +37,7 @@ export default function AppRoutes() {
           <Route path="/addresses" element={<AddressesPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
           <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
         </Route>
       </Route>
