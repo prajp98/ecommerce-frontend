@@ -157,16 +157,22 @@ export default function OrdersPage() {
                 </div>
               </div>
 
-              <button
-                onClick={() =>
-                  setExpandedOrderId(
-                    expandedOrderId === order.orderId ? null : order.orderId
-                  )
-                }
-                className="cursor-pointer mt-5 text-sm font-medium text-black underline"
-              >
-                {expandedOrderId === order.orderId ? "Hide items" : "View items"}
-              </button>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button
+                  onClick={() =>
+                    setExpandedOrderId(
+                      expandedOrderId === order.orderId ? null : order.orderId
+                    )
+                  }
+                  className="cursor-pointer text-sm font-medium text-black underline"
+                >
+                  {expandedOrderId === order.orderId ? "Hide items" : "View items"}
+                </button>
+
+                <Link to={`/orders/${order.orderId}`}>
+                  <Button variant="secondary">View details</Button>
+                </Link>
+              </div>
 
               {expandedOrderId === order.orderId && (
                 <div className="mt-4 space-y-3 border-t pt-4">
