@@ -5,6 +5,7 @@ import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
+import OrderStatusBadge from "../../components/ui/OrderStatusBadge";
 
 type OrderItem = {
   orderItemId: number;
@@ -127,19 +128,7 @@ export default function OrderDetailsPage() {
               </div>
 
               <div className="text-left md:text-right">
-                <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                    order.status === "DELIVERED"
-                      ? "bg-green-100 text-green-700"
-                      : order.status === "CANCELLED"
-                      ? "bg-red-100 text-red-700"
-                      : order.status === "SHIPPED"
-                      ? "bg-blue-100 text-blue-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {order.status}
-                </span>
+                <OrderStatusBadge status={order.status} />
 
                 <p className="mt-3 text-sm text-gray-500">Total</p>
                 <p className="text-2xl font-bold text-black">₹{order.totalAmount}</p>
