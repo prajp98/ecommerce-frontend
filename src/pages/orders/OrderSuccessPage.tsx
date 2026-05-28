@@ -81,6 +81,7 @@ export default function OrderSuccessPage() {
   const displayOrderNumber = order?.orderNumber || state?.orderNumber;
   const displayTotalAmount = order?.totalAmount ?? state?.totalAmount;
   const displayPaymentMethod = order?.paymentMethod || state?.paymentMethod;
+  const detailsOrderId = order?.orderId ?? orderId;
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-10">
@@ -157,6 +158,10 @@ export default function OrderSuccessPage() {
           <div className="flex flex-wrap gap-3 pt-2">
             <Link to="/orders">
               <Button>View orders</Button>
+            </Link>
+
+            <Link to={`/orders/${detailsOrderId}`}>
+              <Button variant="secondary">View details</Button>
             </Link>
 
             <Link to="/products">
