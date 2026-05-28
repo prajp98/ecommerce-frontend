@@ -65,7 +65,6 @@ export default function OrdersAdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
   const [statusMap, setStatusMap] = useState<Record<number, string>>({});
 
@@ -219,46 +218,10 @@ export default function OrdersAdminPage() {
                     : "Update status"}
                 </Button>
 
-                <Button
-                  variant="secondary"
-                  onClick={() =>
-                    setExpandedOrderId(
-                      expandedOrderId === order.orderId ? null : order.orderId
-                    )
-                  }
-                >
-                  {expandedOrderId === order.orderId
-                    ? "Hide items"
-                    : "View items"}
-                </Button>
-
                 <Link to={`/orders/${order.orderId}`}>
                   <Button variant="secondary">View details</Button>
                 </Link>
               </div>
-
-              {expandedOrderId === order.orderId && (
-                <div className="mt-5 space-y-3 border-t pt-5">
-                  {order.orderItems.map((item) => (
-                    <div
-                      key={item.orderItemId}
-                      className="flex flex-col gap-2 rounded-2xl bg-gray-50 p-4 md:flex-row md:items-center md:justify-between"
-                    >
-                      <div>
-                        <p className="font-medium text-black">
-                          {item.productName}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Qty: {item.quantity} × ₹{item.priceAtPurchase}
-                        </p>
-                      </div>
-                      <p className="text-sm font-semibold text-black">
-                        ₹{item.totalPrice}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </Card>
           ))}
         </div>
