@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { api } from "../../lib/api";
 import Button from "../../components/ui/Button";
-import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
 import EmptyState from "../../components/ui/EmptyState";
 import { useToast } from "../../components/ui/Toast";
-import OrderStatusBadge from "../../components/ui/OrderStatusBadge";
+import OrderCard from "../../components/orders/OrderCard";
 import type {
   Order,
   OrdersResponseWrapper,
@@ -108,9 +107,10 @@ export default function OrdersAdminPage() {
       )}
 
       {loading ? (
-        <Card>
-          <p className="text-sm text-gray-500">Loading orders...</p>
-        </Card>
+        <div className="space-y-4">
+          <div className="h-8 w-40 animate-pulse rounded bg-gray-200" />
+          <div className="h-40 animate-pulse rounded-3xl bg-gray-200" />
+        </div>
       ) : orders.length === 0 ? (
         <EmptyState
           title="No orders found"
@@ -119,73 +119,49 @@ export default function OrdersAdminPage() {
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <Card key={order.orderId}>
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="text-lg font-semibold text-black">
-                      {order.orderNumber}
-                    </h3>
-                    <OrderStatusBadge status={order.status} />
-                  </div>
-
-                  <p className="mt-2 text-sm text-gray-500">
-                    Customer: {order.userEmail}
-                  </p>
-
-                  <p className="mt-2 text-sm text-gray-500">
-                    Placed on {new Date(order.createdAt).toLocaleString()}
-                  </p>
-
-                  <p className="mt-2 text-sm text-gray-600">
-                    {order.addressLine1}
-                    {order.addressLine2 ? `, ${order.addressLine2}` : ""},{" "}
-                    {order.city}, {order.state} - {order.zipCode},{" "}
-                    {order.country}
-                  </p>
-
-                  <p className="mt-2 text-sm text-gray-600">
-                    Payment: {order.paymentMethod}
-                  </p>
-                </div>
-
-                <div className="text-left lg:text-right">
+            <OrderCard
+              key={order.orderId}
+              order={order}
+              showCustomer
+              rightContent={
+                <>
                   <p className="text-sm text-gray-500">Total</p>
                   <p className="text-2xl font-bold text-black">
                     ₹{order.totalAmount}
                   </p>
+                </>
+              }
+              actions={
+                <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                  <select
+                    value={statusMap[order.orderId] || order.status}
+                    onChange={(e) =>
+                      handleStatusChange(order.orderId, e.target.value)
+                    }
+                    className="rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none"
+                  >
+                    {ORDER_STATUSES.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+
+                  <Button
+                    onClick={() => handleUpdateStatus(order.orderId)}
+                    disabled={updatingOrderId === order.orderId}
+                  >
+                    {updatingOrderId === order.orderId
+                      ? "Updating..."
+                      : "Update status"}
+                  </Button>
+
+                  <Link to={`/orders/${order.orderId}`}>
+                    <Button variant="secondary">View details</Button>
+                  </Link>
                 </div>
-              </div>
-
-              <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center">
-                <select
-                  value={statusMap[order.orderId] || order.status}
-                  onChange={(e) =>
-                    handleStatusChange(order.orderId, e.target.value)
-                  }
-                  className="rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none"
-                >
-                  {ORDER_STATUSES.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-
-                <Button
-                  onClick={() => handleUpdateStatus(order.orderId)}
-                  disabled={updatingOrderId === order.orderId}
-                >
-                  {updatingOrderId === order.orderId
-                    ? "Updating..."
-                    : "Update status"}
-                </Button>
-
-                <Link to={`/orders/${order.orderId}`}>
-                  <Button variant="secondary">View details</Button>
-                </Link>
-              </div>
-            </Card>
+              }
+            />
           ))}
         </div>
       )}
