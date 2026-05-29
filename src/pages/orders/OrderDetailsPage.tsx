@@ -6,46 +6,12 @@ import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
 import OrderStatusBadge from "../../components/ui/OrderStatusBadge";
-
-type OrderItem = {
-  orderItemId: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  priceAtPurchase: number;
-  totalPrice: number;
-};
-
-type OrderResponse = {
-  orderId: number;
-  orderNumber: string;
-  status: string;
-  totalAmount: number;
-  userId: number;
-  userEmail: string;
-  addressId: number;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  paymentMethod: string;
-  orderItems: OrderItem[];
-  createdAt: string;
-};
-
-type OrderResponseWrapper = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: OrderResponse;
-};
+import type { Order, OrderResponseWrapper } from "../../types/order";
 
 export default function OrderDetailsPage() {
   const { orderId } = useParams();
 
-  const [order, setOrder] = useState<OrderResponse | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -131,7 +97,9 @@ export default function OrderDetailsPage() {
                 <OrderStatusBadge status={order.status} />
 
                 <p className="mt-3 text-sm text-gray-500">Total</p>
-                <p className="text-2xl font-bold text-black">₹{order.totalAmount}</p>
+                <p className="text-2xl font-bold text-black">
+                  ₹{order.totalAmount}
+                </p>
 
                 <p className="mt-2 text-xs text-gray-400">
                   Internal ID: {order.orderId}
