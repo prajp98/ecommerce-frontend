@@ -5,41 +5,8 @@ import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
 import PageHeader from "../../components/ui/PageHeader";
 import Alert from "../../components/ui/Alert";
-
-type OrderItem = {
-  orderItemId: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  priceAtPurchase: number;
-  totalPrice: number;
-};
-
-type OrderResponse = {
-  orderId: number;
-  orderNumber: string;
-  status: string;
-  totalAmount: number;
-  userId: number;
-  userEmail: string;
-  addressId: number;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  paymentMethod: string;
-  orderItems: OrderItem[];
-  createdAt: string;
-};
-
-type OrderResponseWrapper = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: OrderResponse;
-};
+import OrderStatusBadge from "../../components/ui/OrderStatusBadge";
+import type { Order, OrderResponseWrapper } from "../../types/order";
 
 type OrderSuccessState = {
   orderNumber?: string;
@@ -52,7 +19,7 @@ export default function OrderSuccessPage() {
   const location = useLocation();
   const state = location.state as OrderSuccessState | null;
 
-  const [order, setOrder] = useState<OrderResponse | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -142,6 +109,9 @@ export default function OrderSuccessPage() {
 
               {order?.status && (
                 <div className="rounded-2xl border border-gray-200 p-4">
+                  <div className="mb-2">
+                    <OrderStatusBadge status={order.status} />
+                  </div>
                   <p className="text-sm text-gray-500">Status</p>
                   <p className="mt-1 text-lg font-semibold text-black">
                     {order.status}
