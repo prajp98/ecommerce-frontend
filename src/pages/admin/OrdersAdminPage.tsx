@@ -8,48 +8,11 @@ import PageHeader from "../../components/ui/PageHeader";
 import EmptyState from "../../components/ui/EmptyState";
 import { useToast } from "../../components/ui/Toast";
 import OrderStatusBadge from "../../components/ui/OrderStatusBadge";
-
-type OrderItem = {
-  orderItemId: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  priceAtPurchase: number;
-  totalPrice: number;
-};
-
-type Order = {
-  orderId: number;
-  orderNumber: string;
-  status: string;
-  totalAmount: number;
-  userId: number;
-  userEmail: string;
-  addressId: number;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  paymentMethod: string;
-  orderItems: OrderItem[];
-  createdAt: string;
-};
-
-type OrderListResponseWrapper = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: Order[];
-};
-
-type OrderResponseWrapper = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: Order;
-};
+import type {
+  Order,
+  OrdersResponseWrapper,
+  OrderResponseWrapper,
+} from "../../types/order";
 
 const ORDER_STATUSES = [
   "PENDING",
@@ -73,7 +36,7 @@ export default function OrdersAdminPage() {
       setLoading(true);
       setError("");
 
-      const response = await api.get<OrderListResponseWrapper>("/orders");
+      const response = await api.get<OrdersResponseWrapper>("/orders");
       const data = response.data.data;
 
       setOrders(data);
