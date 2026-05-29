@@ -3,47 +3,12 @@ import { Link, useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/ui/Button";
-import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
 import { useToast } from "../../components/ui/Toast";
-import OrderStatusBadge from "../../components/ui/OrderStatusBadge";
-
-type OrderItem = {
-  orderItemId: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  priceAtPurchase: number;
-  totalPrice: number;
-};
-
-type Order = {
-  orderId: number;
-  orderNumber: string;
-  status: string;
-  totalAmount: number;
-  userId: number;
-  userEmail: string;
-  addressId: number;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  paymentMethod: string;
-  orderItems: OrderItem[];
-  createdAt: string;
-};
-
-type OrdersResponseWrapper = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: Order[];
-};
+import OrderCard from "../../components/orders/OrderCard";
+import type { Order, OrdersResponseWrapper } from "../../types/order";
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -122,46 +87,17 @@ export default function OrdersPage() {
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <Card key={order.orderId}>
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="text-lg font-semibold text-black">
-                      {order.orderNumber}
-                    </h2>
-                    <OrderStatusBadge status={order.status} />
-                  </div>
-
-                  <p className="mt-2 text-sm text-gray-500">
-                    Placed on {new Date(order.createdAt).toLocaleString()}
-                  </p>
-
-                  <p className="mt-2 text-sm text-gray-600">
-                    {order.addressLine1}
-                    {order.addressLine2 ? `, ${order.addressLine2}` : ""},{" "}
-                    {order.city}, {order.state} - {order.zipCode},{" "}
-                    {order.country}
-                  </p>
-
-                  <p className="mt-2 text-sm text-gray-600">
-                    Payment: {order.paymentMethod}
-                  </p>
+            <OrderCard
+              key={order.orderId}
+              order={order}
+              actions={
+                <div className="flex flex-wrap gap-3">
+                  <Link to={`/orders/${order.orderId}`}>
+                    <Button variant="secondary">View details</Button>
+                  </Link>
                 </div>
-
-                <div className="text-left md:text-right">
-                  <p className="text-sm text-gray-500">Total</p>
-                  <p className="text-2xl font-bold text-black">
-                    ₹{order.totalAmount}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Link to={`/orders/${order.orderId}`}>
-                  <Button variant="secondary">View details</Button>
-                </Link>
-              </div>
-            </Card>
+              }
+            />
           ))}
         </div>
       )}
