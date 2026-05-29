@@ -26,16 +26,16 @@ export type OrderItem = {
     createdAt: string;
   };
   
-  export type OrderResponseWrapper = {
-    timestamp: string;
-    status: number;
-    message: string;
-    data: Order;
-  };
-  
   export type OrdersResponseWrapper = {
     timestamp: string;
     status: number;
     message: string;
     data: Order[];
   };
+
+  export type OrderResponseWrapper = {
+    timestamp: string;
+    status: number;
+    message: string;
+    data: Order;
+};
