@@ -3,10 +3,9 @@ import { Link } from "react-router";
 import { api } from "../../lib/api";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
-import Button from "../../components/ui/Button";
-import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
 import { useToast } from "../../components/ui/Toast";
+import type { Order } from "../../types/order";
 
 type Category = {
   id: number;
@@ -24,25 +23,6 @@ type Product = {
   categoryId: number;
   categoryName: string;
   active: boolean;
-};
-
-type Order = {
-  orderId: number;
-  orderNumber: string;
-  status: string;
-  totalAmount: number;
-  userId: number;
-  userEmail: string;
-  addressId: number;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  paymentMethod: string;
-  orderItems: unknown[];
-  createdAt: string;
 };
 
 type ListResponseWrapper<T> = {
