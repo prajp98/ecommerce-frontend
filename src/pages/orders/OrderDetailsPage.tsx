@@ -85,7 +85,8 @@ export default function OrderDetailsPage() {
                 <p className="mt-2 text-sm text-gray-600">
                   {order.addressLine1}
                   {order.addressLine2 ? `, ${order.addressLine2}` : ""},{" "}
-                  {order.city}, {order.state} - {order.zipCode}, {order.country}
+                  {order.city}, {order.state} - {order.zipCode},{" "}
+                  {order.country}
                 </p>
 
                 <p className="mt-2 text-sm text-gray-600">
