@@ -1,13 +1,12 @@
-import { Link } from "react-router";
-import Button from "../ui/Button";
-import Card from "../ui/Card";
+import type { ReactNode } from "react";
 import OrderStatusBadge from "../ui/OrderStatusBadge";
+import Card from "../ui/Card";
 import type { Order } from "../../types/order";
 
 type OrderCardProps = {
   order: Order;
-  rightContent?: React.ReactNode;
-  actions?: React.ReactNode;
+  rightContent?: ReactNode;
+  actions?: ReactNode;
   showCustomer?: boolean;
 };
 
@@ -56,7 +55,9 @@ export default function OrderCard({
           ) : (
             <>
               <p className="text-sm text-gray-500">Total</p>
-              <p className="text-2xl font-bold text-black">₹{order.totalAmount}</p>
+              <p className="text-2xl font-bold text-black">
+                ₹{order.totalAmount}
+              </p>
             </>
           )}
         </div>
