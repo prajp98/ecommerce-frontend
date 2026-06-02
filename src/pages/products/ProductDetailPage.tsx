@@ -3,15 +3,14 @@ import { Link, useNavigate, useParams } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import { useToast } from "../../components/ui/Toast";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
-import ProductImage from "../../components/product/ProductImage";
-import { useToast } from "../../components/ui/Toast";
 import type {
   Product,
-  ProductImage as ProductImageType,
+  ProductImage,
   ProductImageListResponse,
 } from "../../types/product";
 
@@ -45,20 +44,25 @@ export default function ProductDetailPage() {
   const { refreshCartCount } = useCart();
   const { showToast } = useToast();
 
+  const productId = useMemo(() => Number(id), [id]);
+
   const [product, setProduct] = useState<Product | null>(null);
-  const [images, setImages] = useState<ProductImageType[]>([]);
-  const [primaryImageUrl, setPrimaryImageUrl] = useState<string>("");
+  const [images, setImages] = useState<ProductImage[]>([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
+
   const [cartItemId, setCartItemId] = useState<number | null>(null);
   const [cartQuantity, setCartQuantity] = useState<number>(0);
 
   const [loading, setLoading] = useState(false);
   const [cartLoading, setCartLoading] = useState(false);
-  const [addingToCart, setAddingToCart] = useState(false);
   const [updatingCart, setUpdatingCart] = useState(false);
   const [error, setError] = useState("");
 
-  const productId = useMemo(() => Number(id), [id]);
+  const primaryImageUrl = useMemo(() => {
+    if (selectedImageUrl) return selectedImageUrl;
+    const primary = images.find((img) => img.primaryImage);
+    return primary?.imageUrl || images[0]?.imageUrl || "";
+  }, [images, selectedImageUrl]);
 
   const fetchCartItemForProduct = async () => {
     if (!isAuthenticated || Number.isNaN(productId)) {
@@ -86,6 +90,8 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     const fetchProduct = async () => {
+      if (Number.isNaN(productId)) return;
+
       try {
         setLoading(true);
         setError("");
@@ -101,14 +107,8 @@ export default function ProductDetailPage() {
         setProduct(productData);
         setImages(imageData);
 
-        const resolvedPrimaryImage =
-          productData.primaryImageUrl ||
-          imageData.find((img) => img.primaryImage)?.imageUrl ||
-          imageData[0]?.imageUrl ||
-          "";
-
-        setPrimaryImageUrl(resolvedPrimaryImage);
-        setSelectedImageUrl(resolvedPrimaryImage);
+        const primary = imageData.find((img) => img.primaryImage);
+        setSelectedImageUrl(primary?.imageUrl || imageData[0]?.imageUrl || "");
       } catch (err: any) {
         setError(err?.response?.data?.message || "Failed to load product");
       } finally {
@@ -116,9 +116,7 @@ export default function ProductDetailPage() {
       }
     };
 
-    if (!Number.isNaN(productId)) {
-      fetchProduct();
-    }
+    fetchProduct();
   }, [productId]);
 
   useEffect(() => {
@@ -133,7 +131,7 @@ export default function ProductDetailPage() {
     }
 
     try {
-      setAddingToCart(true);
+      setUpdatingCart(true);
       setError("");
 
       await api.post("/cart/items", {
@@ -143,11 +141,11 @@ export default function ProductDetailPage() {
 
       await refreshCartCount();
       await fetchCartItemForProduct();
-      showToast("Cart updated successfully", "success");
+      showToast("Added to cart", "success");
     } catch (err: any) {
       showToast(err?.response?.data?.message || "Failed to update cart", "error");
     } finally {
-      setAddingToCart(false);
+      setUpdatingCart(false);
     }
   };
 
@@ -173,7 +171,7 @@ export default function ProductDetailPage() {
 
       await refreshCartCount();
       await fetchCartItemForProduct();
-      showToast("Cart updated successfully", "success");
+      showToast("Cart updated", "success");
     } catch (err: any) {
       showToast(err?.response?.data?.message || "Failed to update cart", "error");
     } finally {
@@ -202,7 +200,10 @@ export default function ProductDetailPage() {
         <Alert variant="error">{error || "Product not found"}</Alert>
 
         <div className="mt-6">
-          <Link to="/products" className="text-sm font-medium text-black underline">
+          <Link
+            to="/products"
+            className="text-sm font-medium text-black underline"
+          >
             Back to products
           </Link>
         </div>
@@ -210,115 +211,162 @@ export default function ProductDetailPage() {
     );
   }
 
-  const currentQuantity = cartQuantity;
+  const qty = cartQuantity;
+  const inStock = product.stock > 0;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10">
-      <PageHeader
-        title={product.name}
-        subtitle={product.categoryName}
-        action={
-          <Link to="/products" className="text-sm font-medium text-black underline">
-            Back to products
-          </Link>
-        }
-      />
+    <section className="bg-gradient-to-b from-white via-pink-50/30 to-blue-50/40">
+      <div className="mx-auto max-w-7xl px-4 py-10">
+        <PageHeader
+          title={product.name}
+          subtitle={product.categoryName}
+          action={
+            <Link to="/products">
+              <Button variant="secondary">Back to products</Button>
+            </Link>
+          }
+        />
 
-      <div className="grid gap-10 md:grid-cols-2">
-        <div>
-          <Card>
-            <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200">
-              <ProductImage
-                src={selectedImageUrl || primaryImageUrl}
-                alt={product.name}
-                fallbackText="No image available"
-              />
-            </div>
-          </Card>
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-4">
+            <Card>
+              <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200">
+                <div className="aspect-square">
+                  {primaryImageUrl ? (
+                    <img
+                      src={primaryImageUrl}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-pink-100 via-white to-blue-100 text-sm font-medium text-gray-400">
+                      No image available
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
 
-          {images.length > 1 && (
-            <div className="mt-4 flex gap-3 overflow-x-auto">
-              {images.map((image) => (
-                <button
-                  key={image.id}
-                  onClick={() => setSelectedImageUrl(image.imageUrl)}
-                  className={`cursor-pointer h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl border transition ${
-                    selectedImageUrl === image.imageUrl
-                      ? "border-black"
-                      : "border-gray-200"
-                  }`}
-                >
-                  <img
-                    src={image.imageUrl}
-                    alt="Product thumbnail"
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col justify-center">
-          <Card>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">
-              {product.categoryName}
-            </p>
-
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-black">
-              {product.name}
-            </h1>
-
-            <p className="mt-4 text-2xl font-bold text-black">₹{product.price}</p>
-
-            <div className="mt-4">
-              <span
-                className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                  product.stock > 0
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {product.stock > 0 ? `In stock: ${product.stock}` : "Out of stock"}
-              </span>
-            </div>
-
-            <p className="mt-6 text-base leading-7 text-gray-600">
-              {product.description}
-            </p>
-
-            {error && (
-              <div className="mt-6">
-                <Alert variant="error">{error}</Alert>
+            {images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {images.map((image) => (
+                  <button
+                    key={image.id}
+                    onClick={() => setSelectedImageUrl(image.imageUrl)}
+                    className={`cursor-pointer h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl border transition ${
+                      selectedImageUrl === image.imageUrl
+                        ? "border-black"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <img
+                      src={image.imageUrl}
+                      alt="Product thumbnail"
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
               </div>
             )}
+          </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <button
-                onClick={handleDecrease}
-                disabled={cartLoading || updatingCart || currentQuantity === 0}
-                className="cursor-pointer h-11 w-11 rounded-2xl border border-gray-300 text-lg font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                −
-              </button>
+          <div className="space-y-6">
+            <Card>
+              <div className="space-y-5">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    {product.categoryName}
+                  </span>
 
-              <div className="flex h-11 min-w-14 items-center justify-center rounded-2xl border border-gray-300 px-4 text-sm font-semibold text-black">
-                {cartLoading ? "..." : currentQuantity}
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      inStock
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-red-50 text-red-700"
+                    }`}
+                  >
+                    {inStock ? `In stock: ${product.stock}` : "Out of stock"}
+                  </span>
+                </div>
+
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight text-black md:text-4xl">
+                    {product.name}
+                  </h1>
+                  <p className="mt-3 text-sm leading-7 text-gray-600">
+                    {product.description}
+                  </p>
+                </div>
+
+                <div className="flex items-end justify-between rounded-3xl bg-gradient-to-r from-pink-50 via-white to-blue-50 p-5">
+                  <div>
+                    <p className="text-sm text-gray-500">Price</p>
+                    <p className="mt-1 text-3xl font-bold text-black">
+                      ₹{product.price}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-sm text-gray-500">Availability</p>
+                    <p className="mt-1 text-sm font-semibold text-black">
+                      {inStock ? "Ready to ship" : "Currently unavailable"}
+                    </p>
+                  </div>
+                </div>
+
+                {error && (
+                  <Alert variant="error">{error}</Alert>
+                )}
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={handleDecrease}
+                    disabled={cartLoading || updatingCart || qty === 0}
+                    className="cursor-pointer h-12 w-12 rounded-2xl border border-gray-300 text-lg font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    −
+                  </button>
+
+                  <div className="flex h-12 min-w-16 items-center justify-center rounded-2xl border border-gray-300 bg-white px-4 text-sm font-semibold text-black">
+                    {cartLoading ? "..." : qty}
+                  </div>
+
+                  <button
+                    onClick={handleIncrease}
+                    disabled={updatingCart || !inStock}
+                    className="cursor-pointer h-12 rounded-2xl bg-black px-5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {updatingCart ? "Updating..." : qty > 0 ? "Add one more" : "Add to cart"}
+                  </button>
+
+                  <Link to="/cart">
+                    <Button variant="secondary">Go to cart</Button>
+                  </Link>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                    <p className="text-sm font-medium text-black">Secure checkout</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Safe and simple checkout flow.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                    <p className="text-sm font-medium text-black">Fast support</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Easy order tracking and status updates.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                    <p className="text-sm font-medium text-black">Easy returns</p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Clear order details and item history.
+                    </p>
+                  </div>
+                </div>
               </div>
-
-              <button
-                onClick={handleIncrease}
-                disabled={addingToCart || updatingCart || product.stock <= 0}
-                className="cursor-pointer h-11 w-11 rounded-2xl bg-black text-lg font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                +
-              </button>
-
-              <Link to="/cart">
-                <Button variant="secondary">Go to cart</Button>
-              </Link>
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
       </div>
     </section>
