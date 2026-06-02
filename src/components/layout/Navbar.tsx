@@ -47,6 +47,9 @@ export default function Navbar() {
           <NavLink to="/orders" className={linkClass}>
             Orders
           </NavLink>
+          <NavLink to="/addresses" className={linkClass}>
+            Addresses
+          </NavLink>
           {user?.role === "ADMIN" && (
             <NavLink to="/admin" className={linkClass}>
               Admin
@@ -71,7 +74,7 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                className="cursor-pointer rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
               >
                 Logout
               </button>
@@ -96,7 +99,7 @@ export default function Navbar() {
 
         <button
           onClick={() => setMobileOpen((prev) => !prev)}
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 md:hidden"
+          className="cursor-pointer rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 md:hidden"
         >
           Menu
         </button>
@@ -108,7 +111,11 @@ export default function Navbar() {
             <NavLink to="/" onClick={closeMobileMenu} className={linkClass}>
               Home
             </NavLink>
-            <NavLink to="/products" onClick={closeMobileMenu} className={linkClass}>
+            <NavLink
+              to="/products"
+              onClick={closeMobileMenu}
+              className={linkClass}
+            >
               Products
             </NavLink>
             <NavLink to="/cart" onClick={closeMobileMenu} className={linkClass}>
@@ -119,11 +126,26 @@ export default function Navbar() {
                 </span>
               )}
             </NavLink>
-            <NavLink to="/orders" onClick={closeMobileMenu} className={linkClass}>
+            <NavLink
+              to="/orders"
+              onClick={closeMobileMenu}
+              className={linkClass}
+            >
               Orders
             </NavLink>
+            <NavLink
+              to="/addresses"
+              onClick={closeMobileMenu}
+              className={linkClass}
+            >
+              Addresses
+            </NavLink>
             {user?.role === "ADMIN" && (
-              <NavLink to="/admin" onClick={closeMobileMenu} className={linkClass}>
+              <NavLink
+                to="/admin"
+                onClick={closeMobileMenu}
+                className={linkClass}
+              >
                 Admin
               </NavLink>
             )}
@@ -145,7 +167,7 @@ export default function Navbar() {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                    className="cursor-pointer w-full rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                   >
                     Logout
                   </button>
