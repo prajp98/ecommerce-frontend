@@ -8,6 +8,7 @@ import Alert from "../../components/ui/Alert";
 import EmptyState from "../../components/ui/EmptyState";
 import PageHeader from "../../components/ui/PageHeader";
 import { useToast } from "../../components/ui/Toast";
+import type { OrderResponseWrapper } from "../../types/order";
 
 type CartItem = {
   cartItemId: number;
@@ -42,19 +43,6 @@ type AddressResponseWrapper = {
   status: number;
   message: string;
   data: Address[];
-};
-
-type OrderResponse = {
-  orderId: number;
-  orderNumber: string;
-  totalAmount: number;
-};
-
-type OrderResponseWrapper = {
-  timestamp: string;
-  status: number;
-  message: string;
-  data: OrderResponse;
 };
 
 export default function CheckoutPage() {
