@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link } from "react-router";
 import { api } from "../../lib/api";
 import Button from "../../components/ui/Button";
@@ -6,6 +6,7 @@ import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
 import Alert from "../../components/ui/Alert";
 import PageHeader from "../../components/ui/PageHeader";
+import EmptyState from "../../components/ui/EmptyState";
 import { useToast } from "../../components/ui/Toast";
 
 type Category = {
@@ -101,9 +102,7 @@ export default function ProductsAdminPage() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
@@ -113,7 +112,7 @@ export default function ProductsAdminPage() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -192,29 +191,67 @@ export default function ProductsAdminPage() {
     }
   };
 
+  const activeCount = products.filter((product) => product.active).length;
+  const inactiveCount = products.length - activeCount;
+
+  const selectedCategory = useMemo(
+    () => categories.find((category) => String(category.id) === formData.categoryId),
+    [categories, formData.categoryId]
+  );
+
   return (
-    <div>
+    <div className="bg-gradient-to-b from-white via-pink-50/30 to-blue-50/40">
       <PageHeader
         title="Products"
         subtitle="Create, update, activate, and deactivate products."
         action={
-          <Button variant="secondary" onClick={fetchData}>
-            Refresh
-          </Button>
+          <div className="flex gap-3">
+            <Link to="/admin/images">
+              <Button variant="secondary">Manage images</Button>
+            </Link>
+            <Button variant="secondary" onClick={fetchData}>
+              Refresh
+            </Button>
+          </div>
         }
       />
 
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <Card>
+          <p className="text-sm font-medium text-gray-500">Total</p>
+          <p className="mt-2 text-2xl font-bold text-black">{products.length}</p>
+          <p className="mt-1 text-sm text-gray-500">Products in catalog</p>
+        </Card>
+
+        <Card>
+          <p className="text-sm font-medium text-gray-500">Active</p>
+          <p className="mt-2 text-2xl font-bold text-emerald-600">{activeCount}</p>
+          <p className="mt-1 text-sm text-gray-500">Visible to shoppers</p>
+        </Card>
+
+        <Card>
+          <p className="text-sm font-medium text-gray-500">Inactive</p>
+          <p className="mt-2 text-2xl font-bold text-rose-600">{inactiveCount}</p>
+          <p className="mt-1 text-sm text-gray-500">Hidden from storefront</p>
+        </Card>
+      </div>
+
       {error && (
-        <div className="mb-6">
+        <div className="mb-6 mt-6">
           <Alert variant="error">{error}</Alert>
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[420px_1fr]">
         <Card>
-          <h3 className="text-lg font-semibold text-black">
-            {editingId ? "Edit product" : "Add product"}
-          </h3>
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-black">
+              {editingId ? "Edit product" : "Add product"}
+            </h3>
+            <p className="text-sm text-gray-500">
+              Keep product names short, clear, and easy to scan.
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <div>
@@ -226,7 +263,7 @@ export default function ProductsAdminPage() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Example: iPhone 15"
+                placeholder="Example: Wireless Headphones"
               />
             </div>
 
@@ -239,7 +276,7 @@ export default function ProductsAdminPage() {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Product description"
-                rows={4}
+                rows={5}
                 className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
               />
             </div>
@@ -254,7 +291,7 @@ export default function ProductsAdminPage() {
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  placeholder="49999"
+                  placeholder="4999"
                 />
               </div>
 
@@ -280,7 +317,7 @@ export default function ProductsAdminPage() {
                 name="categoryId"
                 value={formData.categoryId}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-black"
+                className="cursor-pointer w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-black"
               >
                 <option value="">Select category</option>
                 {categories.map((category) => (
@@ -291,9 +328,11 @@ export default function ProductsAdminPage() {
               </select>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-              Product images are managed separately in the Product Images section.
-            </div>
+            {selectedCategory && (
+              <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                Selected category: <span className="font-semibold">{selectedCategory.name}</span>
+              </div>
+            )}
 
             <div className="flex gap-3">
               <Button type="submit" disabled={saving}>
@@ -311,27 +350,50 @@ export default function ProductsAdminPage() {
 
         <Card>
           <div className="mb-5 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-black">Product list</h3>
-
-            <Link to="/admin/images">
-              <Button variant="secondary">Manage images</Button>
-            </Link>
+            <div>
+              <h3 className="text-lg font-semibold text-black">Product list</h3>
+              <p className="text-sm text-gray-500">
+                Edit visibility and keep the catalog fresh.
+              </p>
+            </div>
           </div>
 
           {loading ? (
-            <p className="text-sm text-gray-500">Loading products...</p>
+            <div className="grid gap-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="animate-pulse rounded-3xl border border-gray-200 p-5"
+                >
+                  <div className="flex gap-4">
+                    <div className="h-20 w-20 rounded-3xl bg-gray-200" />
+                    <div className="flex-1 space-y-3">
+                      <div className="h-5 w-48 rounded bg-gray-200" />
+                      <div className="h-4 w-2/3 rounded bg-gray-200" />
+                      <div className="h-4 w-1/3 rounded bg-gray-200" />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex gap-3">
+                    <div className="h-10 w-24 rounded-2xl bg-gray-200" />
+                    <div className="h-10 w-28 rounded-2xl bg-gray-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : products.length === 0 ? (
-            <p className="text-sm text-gray-500">No products found.</p>
+            <div className="rounded-3xl border border-dashed border-gray-200 bg-gray-50 p-8 text-center">
+              <p className="text-sm text-gray-500">No products found.</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="rounded-2xl border border-gray-200 p-4"
+                  className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="flex gap-4">
-                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-gray-100">
+                      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-3xl bg-gradient-to-br from-pink-100 via-white to-blue-100">
                         {product.primaryImageUrl ? (
                           <img
                             src={product.primaryImageUrl}
@@ -353,15 +415,15 @@ export default function ProductsAdminPage() {
                           <span
                             className={`rounded-full px-3 py-1 text-xs font-medium ${
                               product.active
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-rose-100 text-rose-700"
                             }`}
                           >
                             {product.active ? "Active" : "Inactive"}
                           </span>
                         </div>
 
-                        <p className="mt-2 text-sm text-gray-600">
+                        <p className="mt-2 text-sm leading-6 text-gray-600">
                           {product.description || "No description"}
                         </p>
 
