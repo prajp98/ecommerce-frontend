@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { api } from "../../lib/api";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -71,9 +71,7 @@ export default function CategoriesAdminPage() {
     setEditingId(null);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -82,7 +80,7 @@ export default function CategoriesAdminPage() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -149,8 +147,11 @@ export default function CategoriesAdminPage() {
     }
   };
 
+  const activeCount = categories.filter((category) => category.active).length;
+  const inactiveCount = categories.length - activeCount;
+
   return (
-    <div>
+    <div className="bg-gradient-to-b from-white via-pink-50/30 to-blue-50/40">
       <PageHeader
         title="Categories"
         subtitle="Create, update, activate, and deactivate categories."
@@ -161,17 +162,42 @@ export default function CategoriesAdminPage() {
         }
       />
 
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <Card>
+          <p className="text-sm font-medium text-gray-500">Total</p>
+          <p className="mt-2 text-2xl font-bold text-black">{categories.length}</p>
+          <p className="mt-1 text-sm text-gray-500">Categories in catalog</p>
+        </Card>
+
+        <Card>
+          <p className="text-sm font-medium text-gray-500">Active</p>
+          <p className="mt-2 text-2xl font-bold text-emerald-600">{activeCount}</p>
+          <p className="mt-1 text-sm text-gray-500">Ready for products</p>
+        </Card>
+
+        <Card>
+          <p className="text-sm font-medium text-gray-500">Inactive</p>
+          <p className="mt-2 text-2xl font-bold text-rose-600">{inactiveCount}</p>
+          <p className="mt-1 text-sm text-gray-500">Hidden from users</p>
+        </Card>
+      </div>
+
       {error && (
-        <div className="mb-6">
+        <div className="mb-6 mt-6">
           <Alert variant="error">{error}</Alert>
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[380px_1fr]">
         <Card>
-          <h3 className="text-lg font-semibold text-black">
-            {editingId ? "Edit category" : "Add category"}
-          </h3>
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-black">
+              {editingId ? "Edit category" : "Add category"}
+            </h3>
+            <p className="text-sm text-gray-500">
+              Keep the category names short and clear for better browsing.
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <div>
@@ -196,7 +222,7 @@ export default function CategoriesAdminPage() {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Category description"
-                rows={4}
+                rows={5}
                 className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none transition focus:border-black"
               />
             </div>
@@ -217,38 +243,56 @@ export default function CategoriesAdminPage() {
 
         <Card>
           <div className="mb-5 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-black">Category list</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-black">Category list</h3>
+              <p className="text-sm text-gray-500">
+                Manage visibility and update details here.
+              </p>
+            </div>
           </div>
 
           {loading ? (
-            <p className="text-sm text-gray-500">Loading categories...</p>
+            <div className="grid gap-4">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="animate-pulse rounded-2xl border border-gray-200 p-4">
+                  <div className="h-5 w-40 rounded bg-gray-200" />
+                  <div className="mt-3 h-4 w-3/4 rounded bg-gray-200" />
+                  <div className="mt-4 flex gap-3">
+                    <div className="h-10 w-24 rounded-2xl bg-gray-200" />
+                    <div className="h-10 w-28 rounded-2xl bg-gray-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : categories.length === 0 ? (
-            <p className="text-sm text-gray-500">No categories found.</p>
+            <div className="rounded-3xl border border-dashed border-gray-200 bg-gray-50 p-8 text-center">
+              <p className="text-sm text-gray-500">No categories found.</p>
+            </div>
           ) : (
             <div className="space-y-4">
               {categories.map((category) => (
                 <div
                   key={category.id}
-                  className="rounded-2xl border border-gray-200 p-4"
+                  className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
                         <h4 className="text-base font-semibold text-black">
                           {category.name}
                         </h4>
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-medium ${
                             category.active
-                              ? "bg-green-100 text-green-700"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-rose-100 text-rose-700"
                           }`}
                         >
                           {category.active ? "Active" : "Inactive"}
                         </span>
                       </div>
 
-                      <p className="mt-2 text-sm text-gray-600">
+                      <p className="mt-2 text-sm leading-6 text-gray-600">
                         {category.description || "No description"}
                       </p>
                     </div>
