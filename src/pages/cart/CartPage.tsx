@@ -46,7 +46,7 @@ export default function CartPage() {
       setError("");
 
       const response = await api.get<CartResponseWrapper>("/cart/me");
-      setItems(response.data.data);
+      setItems(response.data.data || []);
     } catch (err: any) {
       const message = err?.response?.data?.message || "Failed to load cart";
       setError(message);
