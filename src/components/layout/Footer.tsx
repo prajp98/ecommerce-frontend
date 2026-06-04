@@ -6,7 +6,10 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid gap-8 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
-            <Link to="/" className="text-xl font-bold tracking-tight text-black">
+            <Link
+              to="/"
+              className="text-xl font-bold tracking-tight text-black"
+            >
               ShopNest
             </Link>
             <p className="mt-3 max-w-md text-sm leading-6 text-gray-600">
