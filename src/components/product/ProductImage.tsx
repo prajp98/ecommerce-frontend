@@ -20,9 +20,14 @@ export default function ProductImage({
   if (!resolvedSrc || imageError) {
     return (
       <div
-        className={`flex h-full w-full items-center justify-center bg-gray-100 text-sm text-gray-400 ${className}`}
+        className={`flex h-full w-full items-center justify-center bg-gradient-to-br from-pink-50 via-white to-blue-50 text-sm font-medium text-gray-400 ${className}`}
       >
-        {fallbackText}
+        <div className="flex flex-col items-center gap-2 px-4 text-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-base shadow-sm">
+            ✦
+          </div>
+          <span>{fallbackText}</span>
+        </div>
       </div>
     );
   }
@@ -31,8 +36,9 @@ export default function ProductImage({
     <img
       src={resolvedSrc}
       alt={alt}
-      className={`h-full w-full object-cover ${className}`}
+      className={`h-full w-full object-cover transition duration-300 hover:scale-[1.02] ${className}`}
       onError={() => setImageError(true)}
+      loading="lazy"
     />
   );
 }
