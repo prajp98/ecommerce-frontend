@@ -23,9 +23,12 @@ export default function Navbar() {
   const closeMobileMenu = () => setMobileOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-        <Link to="/" className="text-xl font-bold tracking-tight text-black">
+        <Link
+          to="/"
+          className="text-xl font-bold tracking-tight text-black transition hover:opacity-80"
+        >
           ShopNest
         </Link>
 
@@ -60,7 +63,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           {isAuthenticated ? (
             <>
-              <div className="flex items-center gap-3 rounded-full border border-gray-200 px-4 py-2">
+              <div className="flex items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-sm">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
                   {user?.name?.charAt(0)?.toUpperCase() || "U"}
                 </div>
@@ -74,7 +77,7 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="cursor-pointer rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                className="cursor-pointer rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
               >
                 Logout
               </button>
@@ -83,7 +86,7 @@ export default function Navbar() {
             <>
               <Link
                 to="/login"
-                className="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
               >
                 Login
               </Link>
@@ -99,14 +102,14 @@ export default function Navbar() {
 
         <button
           onClick={() => setMobileOpen((prev) => !prev)}
-          className="cursor-pointer rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 md:hidden"
+          className="cursor-pointer rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 md:hidden"
         >
           Menu
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="border-t bg-white md:hidden">
+        <div className="border-t border-gray-200 bg-white md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4">
             <NavLink to="/" onClick={closeMobileMenu} className={linkClass}>
               Home
@@ -150,7 +153,7 @@ export default function Navbar() {
               </NavLink>
             )}
 
-            <div className="mt-3 border-t pt-3">
+            <div className="mt-3 border-t border-gray-200 pt-3">
               {isAuthenticated ? (
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
@@ -167,7 +170,7 @@ export default function Navbar() {
 
                   <button
                     onClick={handleLogout}
-                    className="cursor-pointer w-full rounded-2xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                    className="cursor-pointer w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                   >
                     Logout
                   </button>
@@ -177,7 +180,7 @@ export default function Navbar() {
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                    className="flex-1 rounded-2xl border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                    className="flex-1 rounded-2xl border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                   >
                     Login
                   </Link>
