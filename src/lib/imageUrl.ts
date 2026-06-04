@@ -1,15 +1,23 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 export function resolveImageUrl(src?: string | null) {
   if (!src) return "";
 
-  if (src.startsWith("http://") || src.startsWith("https://")) {
-    return src;
+  const trimmed = src.trim();
+  if (!trimmed) return "";
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
   }
 
-  if (src.startsWith("/uploads/")) {
-    return `${API_BASE_URL}${src}`;
+  if (trimmed.startsWith("/uploads/")) {
+    return `${API_BASE_URL.replace(/\/$/, "")}${trimmed}`;
   }
 
-  return src;
+  if (trimmed.startsWith("uploads/")) {
+    return `${API_BASE_URL.replace(/\/$/, "")}/${trimmed}`;
+  }
+
+  return trimmed;
 }
