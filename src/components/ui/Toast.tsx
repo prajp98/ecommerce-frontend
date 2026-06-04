@@ -1,4 +1,11 @@
-import { createContext, type ReactNode, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 
 type ToastType = "success" | "error" | "info";
 
@@ -17,7 +24,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = (message: string, type: ToastType = "info") => {
+  const showToast = useCallback((message: string, type: ToastType = "info") => {
     const id = Date.now() + Math.random();
     const toast: Toast = { id, type, message };
 
@@ -26,13 +33,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     window.setTimeout(() => {
       setToasts((prev) => prev.filter((item) => item.id !== id));
     }, 2800);
-  };
+  }, []);
 
-  const dismissToast = (id: number) => {
+  const dismissToast = useCallback((id: number) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  };
+  }, []);
 
-  const value = useMemo(() => ({ showToast }), []);
+  const value = useMemo(() => ({ showToast }), [showToast]);
 
   return (
     <ToastContext.Provider value={value}>
@@ -42,12 +49,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-sm transition ${
+            className={`pointer-events-auto rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-sm transition-all duration-200 ${
               toast.type === "success"
-                ? "border-green-200 bg-green-50 text-green-800"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
                 : toast.type === "error"
                 ? "border-red-200 bg-red-50 text-red-700"
-                : "border-gray-200 bg-white text-gray-700"
+                : "border-blue-200 bg-blue-50 text-blue-700"
             }`}
           >
             <div className="flex items-start justify-between gap-3">
